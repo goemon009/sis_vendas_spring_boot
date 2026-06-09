@@ -1,63 +1,22 @@
-package com.ifmt.sisvendas.model;
+package com.ifmt.sisvendas.dto;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import tools.jackson.databind.JsonNode;
 
-@Entity
-@Table(name = "produto")
-public class Produto {
+public class ProdutoRequest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_produto")
-    private Integer idProduto;
-
-    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
-
-    @Column(name = "vl_custo", nullable = false)
     private BigDecimal vlCusto;
-
-    @Column(name = "qtd_estoque", nullable = false)
     private Integer qtdEstoque;
-
-    @Column(name = "qntd_reservada_produto", nullable = false)
     private Integer qntdReservadaProduto;
-
-    @Column(name = "qntd_min_estoque", nullable = false)
     private Integer qntdMinEstoque;
-
-    @Column(name = "qntd_max_estoque", nullable = false)
     private Integer qntdMaxEstoque;
-
-    @Column(name = "percentual_comissao", nullable = false)
     private BigDecimal percentualComissao;
-
-    @Column(name = "percentual_promocao")
     private BigDecimal percentualPromocao;
-
-    @Column(name = "margem_lucro", nullable = false)
     private BigDecimal margemLucro;
-
-    @ManyToOne
-    @JoinColumn(name = "id_categoria_produto", nullable = false)
-    private CategoriaProduto categoriaProduto;
-
-    public Integer getIdProduto() {
-        return idProduto;
-    }
-
-    public void setIdProduto(Integer idProduto) {
-        this.idProduto = idProduto;
-    }
+    private Integer idCategoriaProduto;
+    private JsonNode categoriaProduto;
 
     public String getNome() {
         return nome;
@@ -131,11 +90,19 @@ public class Produto {
         this.margemLucro = margemLucro;
     }
 
-    public CategoriaProduto getCategoriaProduto() {
+    public Integer getIdCategoriaProduto() {
+        return idCategoriaProduto;
+    }
+
+    public void setIdCategoriaProduto(Integer idCategoriaProduto) {
+        this.idCategoriaProduto = idCategoriaProduto;
+    }
+
+    public JsonNode getCategoriaProduto() {
         return categoriaProduto;
     }
 
-    public void setCategoriaProduto(CategoriaProduto categoriaProduto) {
+    public void setCategoriaProduto(JsonNode categoriaProduto) {
         this.categoriaProduto = categoriaProduto;
     }
 }
