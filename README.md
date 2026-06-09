@@ -1,56 +1,56 @@
 # SGCVP
 
-Sistema de Gestao de Compra e Venda de Produtos (SGCVP) desenvolvido em Java com Spring Boot, com persistencia em PostgreSQL e exposicao de servicos REST.
+Sistema de Gestão de Compra e Venda de Produtos (SGCVP) desenvolvido em Java com Spring Boot, com persistência em PostgreSQL e exposição de serviços REST.
 
-Este projeto foi iniciado a partir do estudo de caso "Sistema de Gestao de Compra e Venda de Produtos (SGCVP)", usado na disciplina de Programacao Orientada a Servicos. O documento define um sistema para controle de produtos, categorias, promotores de venda, clientes, pedidos, compras, comissoes e consultas operacionais.
+Este projeto foi iniciado a partir do estudo de caso "Sistema de Gestão de Compra e Venda de Produtos (SGCVP)", usado na disciplina de Programação Orientada a Serviços. O documento define um sistema para controle de produtos, categorias, promotores de venda, clientes, pedidos, compras, comissões e consultas operacionais.
 
 ## Objetivo do estudo de caso
 
-De acordo com o documento de referencia, o sistema deve atender cenarios como:
+De acordo com o documento de referência, o sistema deve atender a cenários como:
 
-- cadastro de produtos e categorias;
-- organizacao de produtos por categoria;
-- controle de estoque;
-- gestao de promotores de venda e regioes de atendimento;
-- cadastro de clientes;
-- processamento de pedidos de clientes;
-- processamento de pedidos a fornecedores;
-- geracao e quitacao de comissoes;
-- consultas operacionais e gerenciais.
+* cadastro de produtos e categorias;
+* organização de produtos por categoria;
+* controle de estoque;
+* gestão de promotores de venda e regiões de atendimento;
+* cadastro de clientes;
+* processamento de pedidos de clientes;
+* processamento de pedidos a fornecedores;
+* geração e quitação de comissões;
+* consultas operacionais e gerenciais.
 
 ## Escopo implementado hoje
 
-A aplicacao ainda representa uma parte inicial do SGCVP. No estado atual do repositorio, estao implementados:
+A aplicação ainda representa uma parte inicial do SGCVP. No estado atual do repositório, estão implementados:
 
-- CRUD de `CategoriaProduto`;
-- CRUD de `Produto`;
-- associacao de `Produto` com `CategoriaProduto`;
-- persistencia em PostgreSQL;
-- documentacao OpenAPI/Swagger;
-- testes automatizados usando profile `h2`.
+* CRUD de `CategoriaProduto`;
+* CRUD de `Produto`;
+* associação de `Produto` com `CategoriaProduto`;
+* persistência em PostgreSQL;
+* documentação OpenAPI/Swagger;
+* testes automatizados usando o profile `h2`.
 
-## O que ainda nao foi implementado
+## O que ainda não foi implementado
 
-O estudo de caso preve um escopo maior do que o codigo atual. Ainda faltam, entre outros pontos:
+O estudo de caso prevê um escopo maior do que o código atual. Ainda faltam, entre outros pontos:
 
-- entidades como `Promotor de Venda`, `Cliente`, `Pedido do Cliente`, `Pedido ao Fornecedor` e `Comissao`;
-- servicos de mudanca de estado de pedidos, compras e comissoes;
-- consultas especificas listadas no documento;
-- autenticacao de usuarios;
-- HATEOAS;
-- modelo fisico SQL versionado no repositorio;
-- logs e padroes de erro mais estruturados.
+* entidades como `Promotor de Venda`, `Cliente`, `Pedido do Cliente`, `Pedido ao Fornecedor` e `Comissão`;
+* serviços de mudança de estado de pedidos, compras e comissões;
+* consultas específicas listadas no documento;
+* autenticação de usuários;
+* HATEOAS;
+* modelo físico SQL versionado no repositório;
+* logs e padrões de erro mais estruturados.
 
 ## Tecnologias utilizadas
 
-- Java 21
-- Spring Boot 4.0.6
-- Spring Web MVC
-- Spring Data JPA
-- PostgreSQL
-- SpringDoc OpenAPI
-- Maven Wrapper
-- H2 apenas para testes
+* Java 21
+* Spring Boot 4.0.6
+* Spring Web MVC
+* Spring Data JPA
+* PostgreSQL
+* SpringDoc OpenAPI
+* Maven Wrapper
+* H2 apenas para testes
 
 ## Estrutura atual do projeto
 
@@ -78,10 +78,10 @@ Representa a categoria de um produto.
 
 Campos atuais:
 
-- `idCategoriaProduto`
-- `nome`
-- `percentualComissao`
-- `percentualDesconto`
+* `idCategoriaProduto`
+* `nome`
+* `percentualComissao`
+* `percentualDesconto`
 
 ### Produto
 
@@ -89,25 +89,25 @@ Representa um produto comercializado.
 
 Campos atuais:
 
-- `idProduto`
-- `nome`
-- `vlCusto`
-- `qtdEstoque`
-- `qntdReservadaProduto`
-- `qntdMinEstoque`
-- `qntdMaxEstoque`
-- `percentualComissao`
-- `percentualPromocao`
-- `margemLucro`
-- `categoriaProduto`
+* `idProduto`
+* `nome`
+* `vlCusto`
+* `qtdEstoque`
+* `qntdReservadaProduto`
+* `qntdMinEstoque`
+* `qntdMaxEstoque`
+* `percentualComissao`
+* `percentualPromocao`
+* `margemLucro`
+* `categoriaProduto`
 
-## Configuracao do banco de dados
+## Configuração do banco de dados
 
-O ambiente padrao da aplicacao usa PostgreSQL.
+O ambiente padrão da aplicação usa PostgreSQL.
 
-Arquivo: [src/main/resources/application.properties](/mnt/c/Users/leuca/OneDrive/Documentos/Projetos/sisvendas/src/main/resources/application.properties:1)
+Arquivo: `src/main/resources/application.properties`
 
-Configuracao padrao:
+Configuração padrão:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sgcvp}
@@ -115,28 +115,28 @@ spring.datasource.username=${DB_USER:postgres}
 spring.datasource.password=${DB_PASSWORD:123456}
 ```
 
-Variaveis suportadas:
+Variáveis suportadas:
 
-- `DB_HOST`
-- `DB_PORT`
-- `DB_NAME`
-- `DB_USER`
-- `DB_PASSWORD`
+* `DB_HOST`
+* `DB_PORT`
+* `DB_NAME`
+* `DB_USER`
+* `DB_PASSWORD`
 
-Observacoes:
+Observações:
 
-- o Hibernate esta configurado com `spring.jpa.hibernate.ddl-auto=update`;
-- as tabelas sao criadas ou ajustadas automaticamente no banco configurado;
-- o profile `h2` existe apenas para testes automatizados.
+* o Hibernate está configurado com `spring.jpa.hibernate.ddl-auto=update`;
+* as tabelas são criadas ou ajustadas automaticamente no banco configurado;
+* o profile `h2` existe apenas para testes automatizados.
 
 ## Como executar
 
-### Pre-requisitos
+### Pré-requisitos
 
-- JDK 21
-- PostgreSQL em execucao
-- banco `sgcvp` criado
-- usuario e senha configurados para acesso
+* JDK 21
+* PostgreSQL em execução
+* banco `sgcvp` criado
+* usuário e senha configurados para acesso
 
 ### Executando com Maven Wrapper
 
@@ -154,25 +154,25 @@ mvnw.cmd spring-boot:run
 
 Garanta que o `JAVA_HOME` esteja apontando para um JDK 21 antes de executar o comando.
 
-Se quiser sobrescrever a conexao com o banco:
+Se quiser sobrescrever a conexão com o banco:
 
 ```bash
 DB_HOST=localhost DB_PORT=5432 DB_NAME=sgcvp DB_USER=postgres DB_PASSWORD=123456 ./mvnw spring-boot:run
 ```
 
-### Observacao para ambiente WSL
+### Observação para ambiente WSL
 
-Se a aplicacao estiver rodando dentro do WSL e o PostgreSQL estiver instalado no Windows host, pode ser necessario ajustar rede, firewall e `pg_hba.conf` para permitir conexoes externas ao `localhost` do Windows.
+Se a aplicação estiver rodando dentro do WSL e o PostgreSQL estiver instalado no Windows host, pode ser necessário ajustar rede, firewall e `pg_hba.conf` para permitir conexões externas ao `localhost` do Windows.
 
 ## Testes
 
-Os testes usam H2 em memoria com o profile `h2`, para nao depender do PostgreSQL local.
+Os testes usam H2 em memória com o profile `h2`, para não depender do PostgreSQL local.
 
 ```bash
 ./mvnw test
 ```
 
-## Endpoints atualmente disponiveis
+## Endpoints atualmente disponíveis
 
 Base URL:
 
@@ -188,7 +188,7 @@ http://localhost:8080
 GET /categorias
 ```
 
-#### Buscar categoria por id
+#### Buscar categoria por ID
 
 ```http
 GET /categorias/{id}
@@ -205,7 +205,7 @@ Exemplo:
 
 ```json
 {
-  "nome": "Calcados",
+  "nome": "Calçados",
   "percentualComissao": 10.50,
   "percentualDesconto": 5.00
 }
@@ -232,7 +232,7 @@ DELETE /categorias/{id}
 GET /produtos
 ```
 
-#### Buscar produto por id
+#### Buscar produto por ID
 
 ```http
 GET /produtos/{id}
@@ -245,17 +245,17 @@ POST /produtos
 Content-Type: application/json
 ```
 
-O endpoint aceita a categoria de tres formas:
+O endpoint aceita a categoria de três formas:
 
-- `idCategoriaProduto`
-- `categoriaProduto` como numero
-- `categoriaProduto` como objeto com `id` ou `idCategoriaProduto`
+* `idCategoriaProduto`
+* `categoriaProduto` como número
+* `categoriaProduto` como objeto com `id` ou `idCategoriaProduto`
 
 Exemplo recomendado:
 
 ```json
 {
-  "nome": "Tenis Esportivo",
+  "nome": "Tênis Esportivo",
   "vlCusto": 120.00,
   "qtdEstoque": 15,
   "qntdReservadaProduto": 2,
@@ -268,11 +268,11 @@ Exemplo recomendado:
 }
 ```
 
-Tambem funciona:
+Também funciona:
 
 ```json
 {
-  "nome": "Tenis Esportivo",
+  "nome": "Tênis Esportivo",
   "vlCusto": 120.00,
   "qtdEstoque": 15,
   "qntdReservadaProduto": 2,
@@ -302,39 +302,39 @@ DELETE /produtos/{id}
 
 No controller atual:
 
-- um produto so pode ser salvo se a categoria existir;
-- quando a categoria informada nao existe, a API retorna `400 Bad Request`;
-- a relacao `Produto -> CategoriaProduto` eh obrigatoria.
+* um produto só pode ser salvo se a categoria existir;
+* quando a categoria informada não existe, a API retorna `400 Bad Request`;
+* a relação `Produto -> CategoriaProduto` é obrigatória.
 
 ## Swagger
 
-Com a aplicacao em execucao, a documentacao pode ser acessada em:
+Com a aplicação em execução, a documentação pode ser acessada em:
 
-- `http://localhost:8080/swagger-ui.html`
-- `http://localhost:8080/v3/api-docs`
+* `http://localhost:8080/swagger-ui.html`
+* `http://localhost:8080/v3/api-docs`
 
-Dependendo da versao do frontend do SpringDoc, `swagger-ui/index.html` tambem pode estar disponivel.
+Dependendo da versão do frontend do SpringDoc, `swagger-ui/index.html` também pode estar disponível.
 
-## Relacao com o estudo de caso
+## Relação com o estudo de caso
 
 O documento exige uma API REST com:
 
-- CRUD de entidades;
-- operacoes de processamento;
-- consultas especializadas;
-- modelo fisico em PostgreSQL;
-- criterios de qualidade como autenticacao, logs e HATEOAS.
+* CRUD de entidades;
+* operações de processamento;
+* consultas especializadas;
+* modelo físico em PostgreSQL;
+* critérios de qualidade como autenticação, logs e HATEOAS.
 
-Este repositorio atualmente atende apenas uma primeira fatia desse estudo de caso, concentrada em categorias e produtos. Portanto, este projeto deve ser entendido como base inicial para evolucao do SGCVP completo.
+Este repositório atualmente atende apenas a uma primeira fatia desse estudo de caso, concentrada em categorias e produtos. Portanto, este projeto deve ser entendido como base inicial para a evolução do SGCVP completo.
 
-## Proximos passos sugeridos
+## Próximos passos sugeridos
 
-- implementar as entidades faltantes do estudo de caso;
-- criar os estados de pedido, compra e comissao;
-- adicionar servicos de processamento;
-- implementar consultas especializadas;
-- introduzir camada de servico para regras de negocio;
-- adicionar validacoes de entrada com Bean Validation;
-- padronizar respostas de erro;
-- adicionar autenticacao;
-- gerar script SQL versionado do modelo fisico.
+* implementar as entidades faltantes do estudo de caso;
+* criar os estados de pedido, compra e comissão;
+* adicionar serviços de processamento;
+* implementar consultas especializadas;
+* introduzir camada de serviço para regras de negócio;
+* adicionar validações de entrada com Bean Validation;
+* padronizar respostas de erro;
+* adicionar autenticação;
+* gerar script SQL versionado do modelo físico.
