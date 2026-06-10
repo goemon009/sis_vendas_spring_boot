@@ -3,12 +3,16 @@ package com.ifmt.sisvendas.model;
 import java.math.BigDecimal;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "produto")
 public class Produto {
 
     @Id
@@ -25,13 +29,13 @@ public class Produto {
     @Column(name = "qtd_estoque", nullable = false)
     private Integer qtdEstoque;
 
-    @Column(name = "qntd_reservada_produto", nullable = false)
+    @Column(name = "QTD_Reservada_Produto", nullable = false)
     private Integer qntdReservadaProduto;
 
-    @Column(name = "qntd_min_estoque", nullable = false)
+    @Column(name = "QTD_MIN_Estoque", nullable = false)
     private Integer qntdMinEstoque;
 
-    @Column(name = "qntd_max_estoque", nullable = false)
+    @Column(name = "QTD_MAX_Estoque", nullable = false)
     private Integer qntdMaxEstoque;
 
     @Column(name = "percentual_comissao", nullable = false)
