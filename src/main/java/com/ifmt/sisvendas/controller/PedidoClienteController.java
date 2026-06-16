@@ -3,8 +3,16 @@ package com.ifmt.sisvendas.controller;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.ifmt.sisvendas.model.Comissao;
 import com.ifmt.sisvendas.model.ItemPedidoCliente;
@@ -33,6 +41,23 @@ public class PedidoClienteController {
         this.itemRepository = itemRepository;
         this.produtoRepository = produtoRepository;
         this.comissaoRepository = comissaoRepository;
+    }
+
+    @GetMapping("/{id}/detalhes")
+    public Map<String, Object> buscarPedidoComItens(@PathVariable Integer id) {
+        PedidoCliente pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        List<ItemPedidoCliente> itens
+                = itemRepository.findByPedidoClienteIdPedidoCliente(id);
+
+        return Map.of(
+                "pedido", pedido,
+                "itens", itens
+        );
     }
 
     @GetMapping
@@ -146,8 +171,8 @@ public class PedidoClienteController {
             return pedido;
         }
 
-        List<ItemPedidoCliente> itens =
-                itemRepository.findByPedidoClienteIdPedidoCliente(id);
+        List<ItemPedidoCliente> itens
+                = itemRepository.findByPedidoClienteIdPedidoCliente(id);
 
         BigDecimal valorTotalComissao = BigDecimal.ZERO;
 

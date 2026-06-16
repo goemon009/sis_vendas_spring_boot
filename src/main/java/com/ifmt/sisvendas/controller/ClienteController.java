@@ -1,5 +1,6 @@
 package com.ifmt.sisvendas.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ifmt.sisvendas.model.Cliente;
@@ -22,6 +24,11 @@ public class ClienteController {
 
     public ClienteController(ClienteRepository repository) {
         this.repository = repository;
+    }
+
+    @GetMapping("/cnpj/{cnpj}")
+    public Cliente buscarPorCnpj(@PathVariable String cnpj) {
+        return repository.findByCnpj(cnpj);
     }
 
     @GetMapping
@@ -56,6 +63,19 @@ public class ClienteController {
         cliente.setMunicipio(dados.getMunicipio());
 
         return repository.save(cliente);
+    }
+
+    @GetMapping("/promotor/{idPromotor}/valor-vendido")
+    public List<Object[]> listarClientesPorValorVendido(
+            @PathVariable Integer idPromotor,
+            @RequestParam LocalDate dataInicio,
+            @RequestParam LocalDate dataFim) {
+
+        return repository.buscarClientesPorPromotorOrdenadosPorValorVendido(
+                idPromotor,
+                dataInicio,
+                dataFim
+        );
     }
 
     @DeleteMapping("/{id}")

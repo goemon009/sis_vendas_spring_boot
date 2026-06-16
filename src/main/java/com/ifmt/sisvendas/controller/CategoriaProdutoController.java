@@ -53,6 +53,11 @@ public class CategoriaProdutoController {
         
         return repository.save(categoria);
     }
+
+    @GetMapping("/ordenadas")
+    public List<CategoriaProduto> listarOrdenadasPorNome() {
+        return repository.findAllByOrderByNomeAsc();
+    }
     
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {

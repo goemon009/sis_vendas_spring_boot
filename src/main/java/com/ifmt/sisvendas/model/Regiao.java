@@ -7,7 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity 
+@Entity
 @Table(name = "regiao")
 public class Regiao {
 
@@ -27,11 +27,11 @@ public class Regiao {
         this.id = id;
     }
 
-    public void setIdRegiao(Integer idRegiao) {
-        this.id = idRegiao;
+    public Integer getIdRegiao() {
+        return id;
     }
 
-    public void setId_regiao(Integer idRegiao) {
+    public void setIdRegiao(Integer idRegiao) {
         this.id = idRegiao;
     }
 
@@ -42,6 +42,4 @@ public class Regiao {
     public void setNome(String nome) {
         this.nome = nome;
     }
-
-    
 }
