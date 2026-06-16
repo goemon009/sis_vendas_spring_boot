@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "categoriaproduto")
 public class CategoriaProduto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_categoria_produto")
@@ -42,6 +43,7 @@ public class CategoriaProduto {
         this.nome = nome;
     }
 
+
     public BigDecimal getPercentualComissao() {
         return percentualComissao;
     }
@@ -57,5 +59,4 @@ public class CategoriaProduto {
     public void setPercentualDesconto(BigDecimal percentualDesconto) {
         this.percentualDesconto = percentualDesconto;
     }
-
 }

@@ -1,6 +1,13 @@
 package com.ifmt.sisvendas.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "cliente")
@@ -11,24 +18,28 @@ public class Cliente {
     @Column(name = "id_cliente")
     private Integer idCliente;
 
-    @Column(name = "razao_social")
+    @Column(name = "razao_social", nullable = false, length = 100)
     private String razaoSocial;
 
-    @Column(name = "nome_fantasia")
+    @Column(name = "nome_fantasia", length = 100)
     private String nomeFantasia;
 
-    @Column(name = "cnpj")
+    @Column(name = "cnpj", nullable = false, length = 14)
     private String cnpj;
 
-    @Column(name = "inscricao_estadual")
+    @Column(name = "inscricao_estadual", length = 20)
     private String inscricaoEstadual;
 
-    @Column(name = "endereco")
+    @Column(name = "endereco", length = 200)
     private String endereco;
 
     @ManyToOne
-    @JoinColumn(name = "id_promotor")
+    @JoinColumn(name = "id_promotor", nullable = false)
     private Promotor promotor;
+
+    @ManyToOne
+    @JoinColumn(name = "id_municipio", nullable = false)
+    private Municipio municipio;
 
     public Integer getIdCliente() {
         return idCliente;
@@ -84,5 +95,13 @@ public class Cliente {
 
     public void setPromotor(Promotor promotor) {
         this.promotor = promotor;
+    }
+
+    public Municipio getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(Municipio municipio) {
+        this.municipio = municipio;
     }
 }
