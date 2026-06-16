@@ -27,6 +27,14 @@ public class Regiao {
         this.id = id;
     }
 
+    public void setIdRegiao(Integer idRegiao) {
+        this.id = idRegiao;
+    }
+
+    public void setId_regiao(Integer idRegiao) {
+        this.id = idRegiao;
+    }
+
     public String getNome() {
         return nome;
     }
