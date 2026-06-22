@@ -16,11 +16,15 @@ import com.ifmt.sisvendas.repository.PedidoClienteRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/pedidos-cliente")
-@Tag(name = "Pedidos de Cliente", description = "Operações de cadastro, consulta e processamento dos pedidos realizados por clientes.")
+@Tag(
+        name = "Pedidos de Cliente",
+        description = "Operações de cadastro, consulta e processamento dos pedidos realizados por clientes."
+)
 public class PedidoClienteController {
 
     private final PedidoClienteRepository repository;
@@ -83,9 +87,14 @@ public class PedidoClienteController {
         return repository.save(pedidoCliente);
     }
 
-    @Operation(summary = "Aprovar estoque do pedido", description = "Marca o pedido como aprovado após a validação do estoque.")
-    @ApiResponse(responseCode = "200", description = "Estoque do pedido aprovado com sucesso")
-    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    @Operation(
+            summary = "Aprovar pedido pelo estoque",
+            description = "Muda o status do pedido de SOLICITADO para APROVADO_ESTOQUE após avaliação de disponibilidade dos produtos."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido aprovado pelo estoque com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
     @PutMapping("/{id}/aprovar-estoque")
     public PedidoCliente aprovarEstoque(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -99,9 +108,14 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
-    @Operation(summary = "Marcar pedido como pendente de estoque", description = "Marca o pedido como pendente por indisponibilidade de estoque.")
-    @ApiResponse(responseCode = "200", description = "Pedido marcado como pendente de estoque")
-    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    @Operation(
+            summary = "Marcar pedido como pendente de estoque",
+            description = "Muda o status do pedido de SOLICITADO para PENDENTE_ESTOQUE quando pelo menos um item não possui estoque suficiente."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido marcado como pendente de estoque"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
     @PutMapping("/{id}/pendente-estoque")
     public PedidoCliente pendenteEstoque(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -115,9 +129,14 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
-    @Operation(summary = "Aprovar venda", description = "Marca a venda do pedido como aprovada.")
-    @ApiResponse(responseCode = "200", description = "Venda aprovada com sucesso")
-    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    @Operation(
+            summary = "Aprovar pedido pela venda",
+            description = "Muda o status do pedido de APROVADO_ESTOQUE para APROVADO_VENDA após análise das condições do cliente."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido aprovado pela venda com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
     @PutMapping("/{id}/aprovar-venda")
     public PedidoCliente aprovarVenda(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -131,9 +150,14 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
-    @Operation(summary = "Reprovar venda", description = "Marca a venda do pedido como reprovada.")
-    @ApiResponse(responseCode = "200", description = "Venda reprovada com sucesso")
-    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    @Operation(
+            summary = "Reprovar pedido pela venda",
+            description = "Muda o status do pedido de APROVADO_ESTOQUE para REPROVADO_VENDA quando o cliente não atende às condições comerciais."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido reprovado pela venda"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
     @PutMapping("/{id}/reprovar-venda")
     public PedidoCliente reprovarVenda(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -147,9 +171,14 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
-    @Operation(summary = "Programar entrega", description = "Programa a data de entrega de um pedido de cliente.")
-    @ApiResponse(responseCode = "200", description = "Entrega programada com sucesso")
-    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    @Operation(
+            summary = "Programar entrega do pedido",
+            description = "Define a data prevista de entrega e muda o status do pedido para PEDIDO_PROGRAMADO."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Entrega do pedido programada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
     @PutMapping("/{id}/programar")
     public PedidoCliente programarEntrega(@PathVariable Integer id, @RequestBody PedidoCliente dados) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -164,9 +193,14 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
-    @Operation(summary = "Processar pedido", description = "Processa um pedido programado, atualiza o estoque e lança a comissão do promotor.")
-    @ApiResponse(responseCode = "200", description = "Pedido processado com sucesso")
-    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    @Operation(
+            summary = "Processar pedido de cliente",
+            description = "Processa um pedido programado, realiza a baixa do estoque dos produtos e gera o lançamento de comissão para o promotor de venda."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido processado com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
     @PutMapping("/{id}/processar")
     public PedidoCliente processar(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);

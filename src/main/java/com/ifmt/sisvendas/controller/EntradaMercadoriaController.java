@@ -19,11 +19,15 @@ import com.ifmt.sisvendas.repository.ItemEntradaMercadoriaRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/entradas-mercadoria")
-@Tag(name = "Entradas de Mercadoria", description = "Operações de cadastro, conferência e processamento de entradas de mercadoria.")
+@Tag(
+        name = "Entradas de Mercadoria",
+        description = "Operações de cadastro, conferência e processamento de entradas de mercadoria."
+)
 public class EntradaMercadoriaController {
 
     private final EntradaMercadoriaRepository repository;
@@ -89,9 +93,14 @@ public class EntradaMercadoriaController {
         repository.deleteById(id);
     }
 
-    @Operation(summary = "Conferir entrada de mercadoria", description = "Marca uma entrada de mercadoria como conferida.")
-    @ApiResponse(responseCode = "200", description = "Entrada conferida com sucesso")
-    @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
+    @Operation(
+            summary = "Conferir entrada de mercadoria",
+            description = "Muda o status da entrada de mercadoria de DIGITADA para CONFERIDA após conferência dos produtos físicos recebidos."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Entrada de mercadoria conferida com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Entrada de mercadoria não encontrada")
+    })
     @PutMapping("/{id}/conferir")
     public EntradaMercadoria conferir(@PathVariable Integer id) {
         EntradaMercadoria entrada = repository.findById(id).orElse(null);
@@ -105,9 +114,14 @@ public class EntradaMercadoriaController {
         return repository.save(entrada);
     }
 
-    @Operation(summary = "Processar entrada de mercadoria", description = "Processa uma entrada conferida e atualiza o estoque dos produtos.")
-    @ApiResponse(responseCode = "200", description = "Entrada processada com sucesso")
-    @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
+    @Operation(
+            summary = "Processar entrada de mercadoria",
+            description = "Processa uma entrada conferida, adicionando as quantidades recebidas ao estoque dos respectivos produtos."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Entrada de mercadoria processada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Entrada de mercadoria não encontrada")
+    })
     @PutMapping("/{id}/processar")
     public EntradaMercadoria processar(@PathVariable Integer id) {
         EntradaMercadoria entrada = repository.findById(id).orElse(null);

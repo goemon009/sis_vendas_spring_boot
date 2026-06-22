@@ -15,11 +15,15 @@ import com.ifmt.sisvendas.model.Comissao;
 import com.ifmt.sisvendas.repository.ComissaoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/comissoes")
-@Tag(name = "Comissões", description = "Operações de cadastro, consulta e quitação de lançamentos de comissão dos promotores de venda.")
+@Tag(
+        name = "Comissões",
+        description = "Operações de cadastro, consulta e quitação de lançamentos de comissão dos promotores de venda."
+)
 public class ComissaoController {
 
     private final ComissaoRepository repository;
@@ -73,10 +77,12 @@ public class ComissaoController {
 
     @Operation(
             summary = "Quitar comissão",
-            description = "Muda a situação de uma comissão de LANCADA para QUITADA, representando o pagamento semanal ao promotor de venda."
+            description = "Muda o status de uma comissão de LANCADA para QUITADA, representando o pagamento semanal ao promotor de venda."
     )
-    @ApiResponse(responseCode = "200", description = "Comissão quitada com sucesso")
-    @ApiResponse(responseCode = "404", description = "Comissão não encontrada")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Comissão quitada com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Comissão não encontrada")
+    })
     @PutMapping("/{id}/quitar")
     public Comissao quitar(@PathVariable Integer id) {
         Comissao comissao = repository.findById(id).orElse(null);
