@@ -14,9 +14,13 @@ import com.ifmt.sisvendas.repository.ComissaoRepository;
 import com.ifmt.sisvendas.repository.ItemPedidoClienteRepository;
 import com.ifmt.sisvendas.repository.PedidoClienteRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/pedidos-cliente")
+@Tag(name = "Pedidos de Cliente", description = "Operações de cadastro, consulta e processamento dos pedidos realizados por clientes.")
 public class PedidoClienteController {
 
     private final PedidoClienteRepository repository;
@@ -35,21 +39,32 @@ public class PedidoClienteController {
         this.comissaoRepository = comissaoRepository;
     }
 
+    @Operation(summary = "Listar pedidos de clientes", description = "Retorna todos os pedidos de clientes cadastrados.")
+    @ApiResponse(responseCode = "200", description = "Pedidos retornados com sucesso")
     @GetMapping
     public List<PedidoCliente> listar() {
         return repository.findAll();
     }
 
+    @Operation(summary = "Cadastrar pedido de cliente", description = "Cadastra um novo pedido de cliente.")
+    @ApiResponse(responseCode = "200", description = "Pedido cadastrado com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro do pedido")
     @PostMapping
     public PedidoCliente cadastrar(@RequestBody PedidoCliente pedidoCliente) {
         return repository.save(pedidoCliente);
     }
 
+    @Operation(summary = "Buscar pedido de cliente por ID", description = "Retorna um pedido de cliente pelo seu identificador.")
+    @ApiResponse(responseCode = "200", description = "Pedido encontrado")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @GetMapping("/{id}")
     public PedidoCliente buscarPorId(@PathVariable Integer id) {
         return repository.findById(id).orElse(null);
     }
 
+    @Operation(summary = "Atualizar pedido de cliente", description = "Atualiza os dados de um pedido de cliente existente.")
+    @ApiResponse(responseCode = "200", description = "Pedido atualizado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @PutMapping("/{id}")
     public PedidoCliente atualizar(@PathVariable Integer id, @RequestBody PedidoCliente dados) {
         PedidoCliente pedidoCliente = repository.findById(id).orElse(null);
@@ -68,6 +83,9 @@ public class PedidoClienteController {
         return repository.save(pedidoCliente);
     }
 
+    @Operation(summary = "Aprovar estoque do pedido", description = "Marca o pedido como aprovado após a validação do estoque.")
+    @ApiResponse(responseCode = "200", description = "Estoque do pedido aprovado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @PutMapping("/{id}/aprovar-estoque")
     public PedidoCliente aprovarEstoque(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -81,6 +99,9 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    @Operation(summary = "Marcar pedido como pendente de estoque", description = "Marca o pedido como pendente por indisponibilidade de estoque.")
+    @ApiResponse(responseCode = "200", description = "Pedido marcado como pendente de estoque")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @PutMapping("/{id}/pendente-estoque")
     public PedidoCliente pendenteEstoque(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -94,6 +115,9 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    @Operation(summary = "Aprovar venda", description = "Marca a venda do pedido como aprovada.")
+    @ApiResponse(responseCode = "200", description = "Venda aprovada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @PutMapping("/{id}/aprovar-venda")
     public PedidoCliente aprovarVenda(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -107,6 +131,9 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    @Operation(summary = "Reprovar venda", description = "Marca a venda do pedido como reprovada.")
+    @ApiResponse(responseCode = "200", description = "Venda reprovada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @PutMapping("/{id}/reprovar-venda")
     public PedidoCliente reprovarVenda(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -120,6 +147,9 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    @Operation(summary = "Programar entrega", description = "Programa a data de entrega de um pedido de cliente.")
+    @ApiResponse(responseCode = "200", description = "Entrega programada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @PutMapping("/{id}/programar")
     public PedidoCliente programarEntrega(@PathVariable Integer id, @RequestBody PedidoCliente dados) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -134,6 +164,9 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    @Operation(summary = "Processar pedido", description = "Processa um pedido programado, atualiza o estoque e lança a comissão do promotor.")
+    @ApiResponse(responseCode = "200", description = "Pedido processado com sucesso")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @PutMapping("/{id}/processar")
     public PedidoCliente processar(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -192,6 +225,9 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    @Operation(summary = "Excluir pedido de cliente", description = "Remove um pedido de cliente pelo seu identificador.")
+    @ApiResponse(responseCode = "200", description = "Pedido excluído com sucesso")
+    @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);

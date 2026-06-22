@@ -17,9 +17,13 @@ import com.ifmt.sisvendas.model.Produto;
 import com.ifmt.sisvendas.repository.EntradaMercadoriaRepository;
 import com.ifmt.sisvendas.repository.ItemEntradaMercadoriaRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/entradas-mercadoria")
+@Tag(name = "Entradas de Mercadoria", description = "Operações de cadastro, conferência e processamento de entradas de mercadoria.")
 public class EntradaMercadoriaController {
 
     private final EntradaMercadoriaRepository repository;
@@ -35,21 +39,32 @@ public class EntradaMercadoriaController {
         this.produtoRepository = produtoRepository;
     }
 
+    @Operation(summary = "Listar entradas de mercadoria", description = "Retorna todas as entradas de mercadoria cadastradas.")
+    @ApiResponse(responseCode = "200", description = "Entradas retornadas com sucesso")
     @GetMapping
     public List<EntradaMercadoria> listar() {
         return repository.findAll();
     }
 
+    @Operation(summary = "Cadastrar entrada de mercadoria", description = "Cadastra uma nova entrada de mercadoria.")
+    @ApiResponse(responseCode = "200", description = "Entrada cadastrada com sucesso")
+    @ApiResponse(responseCode = "400", description = "Dados inválidos para cadastro da entrada")
     @PostMapping
     public EntradaMercadoria cadastrar(@RequestBody EntradaMercadoria entradaMercadoria) {
         return repository.save(entradaMercadoria);
     }
 
+    @Operation(summary = "Buscar entrada por ID", description = "Retorna uma entrada de mercadoria pelo seu identificador.")
+    @ApiResponse(responseCode = "200", description = "Entrada encontrada")
+    @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
     @GetMapping("/{id}")
     public EntradaMercadoria buscarPorId(@PathVariable Integer id) {
         return repository.findById(id).orElse(null);
     }
 
+    @Operation(summary = "Atualizar entrada de mercadoria", description = "Atualiza os dados de uma entrada de mercadoria existente.")
+    @ApiResponse(responseCode = "200", description = "Entrada atualizada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
     @PutMapping("/{id}")
     public EntradaMercadoria atualizar(@PathVariable Integer id, @RequestBody EntradaMercadoria dados) {
         EntradaMercadoria entradaMercadoria = repository.findById(id).orElse(null);
@@ -66,11 +81,17 @@ public class EntradaMercadoriaController {
         return repository.save(entradaMercadoria);
     }
 
+    @Operation(summary = "Excluir entrada de mercadoria", description = "Remove uma entrada de mercadoria pelo seu identificador.")
+    @ApiResponse(responseCode = "200", description = "Entrada excluída com sucesso")
+    @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
     }
 
+    @Operation(summary = "Conferir entrada de mercadoria", description = "Marca uma entrada de mercadoria como conferida.")
+    @ApiResponse(responseCode = "200", description = "Entrada conferida com sucesso")
+    @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
     @PutMapping("/{id}/conferir")
     public EntradaMercadoria conferir(@PathVariable Integer id) {
         EntradaMercadoria entrada = repository.findById(id).orElse(null);
@@ -84,6 +105,9 @@ public class EntradaMercadoriaController {
         return repository.save(entrada);
     }
 
+    @Operation(summary = "Processar entrada de mercadoria", description = "Processa uma entrada conferida e atualiza o estoque dos produtos.")
+    @ApiResponse(responseCode = "200", description = "Entrada processada com sucesso")
+    @ApiResponse(responseCode = "404", description = "Entrada não encontrada")
     @PutMapping("/{id}/processar")
     public EntradaMercadoria processar(@PathVariable Integer id) {
         EntradaMercadoria entrada = repository.findById(id).orElse(null);
