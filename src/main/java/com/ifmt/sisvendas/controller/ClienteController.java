@@ -1,7 +1,9 @@
 package com.ifmt.sisvendas.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ifmt.sisvendas.model.Cliente;
@@ -22,7 +25,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/clientes")
 @Tag(
         name = "Clientes",
-        description = "Operações de cadastro e manutenção dos clientes atendidos pelos promotores de venda."
+        description = "Operações de cadastro, manutenção e consulta de clientes."
 )
 public class ClienteController {
 
@@ -66,6 +69,24 @@ public class ClienteController {
     @GetMapping("/cnpj/{cnpj}")
     public Cliente buscarPorCnpj(@PathVariable String cnpj) {
         return repository.findByCnpj(cnpj).orElse(null);
+    }
+
+    @Operation(
+            summary = "Listar clientes do promotor por valor vendido",
+            description = "Retorna os clientes de um promotor de venda, ordenados pelo valor total vendido em ordem decrescente dentro de um intervalo de datas."
+    )
+    @ApiResponse(responseCode = "200", description = "Clientes retornados com sucesso")
+    @GetMapping("/promotor/{idPromotor}/valor-vendido")
+    public List<Cliente> listarClientesPorValorVendido(
+            @PathVariable Integer idPromotor,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim
+    ) {
+        return repository.buscarClientesPorPromotorOrdenadosPorValorVendido(
+                idPromotor,
+                dataInicio,
+                dataFim
+        );
     }
 
     @Operation(

@@ -3,6 +3,7 @@ package com.ifmt.sisvendas.controller;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.*;
 
@@ -70,6 +71,30 @@ public class PedidoClienteController {
     @GetMapping("/status/{status}")
     public List<PedidoCliente> listarPorStatus(@PathVariable String status) {
         return repository.findByStatusOrderByDtSolicitacaoAsc(status);
+    }
+
+    @Operation(
+            summary = "Buscar detalhes do pedido de cliente",
+            description = "Retorna os dados gerais do pedido de cliente e a lista de itens vinculados ao pedido."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido e itens retornados com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
+    })
+    @GetMapping("/{id}/detalhes")
+    public Map<String, Object> buscarDetalhes(@PathVariable Integer id) {
+        PedidoCliente pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        List<ItemPedidoCliente> itens = itemRepository.findByPedidoClienteIdPedidoCliente(id);
+
+        return Map.of(
+                "pedido", pedido,
+                "itens", itens
+        );
     }
 
     @Operation(summary = "Buscar pedido de cliente por ID", description = "Retorna um pedido de cliente pelo seu identificador.")

@@ -1,6 +1,7 @@
 package com.ifmt.sisvendas.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/entradas-mercadoria")
 @Tag(
         name = "Entradas de Mercadoria",
-        description = "Operações de cadastro, conferência e processamento de entradas de mercadoria."
+        description = "Operações de cadastro, conferência, processamento e consulta de entradas de mercadoria."
 )
 public class EntradaMercadoriaController {
 
@@ -56,6 +57,31 @@ public class EntradaMercadoriaController {
     @PostMapping
     public EntradaMercadoria cadastrar(@RequestBody EntradaMercadoria entradaMercadoria) {
         return repository.save(entradaMercadoria);
+    }
+
+    @Operation(
+            summary = "Buscar detalhes da entrada de mercadoria",
+            description = "Retorna os dados gerais da entrada de mercadoria e a lista de itens vinculados."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Entrada de mercadoria e itens retornados com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Entrada de mercadoria não encontrada")
+    })
+    @GetMapping("/{id}/detalhes")
+    public Map<String, Object> buscarDetalhes(@PathVariable Integer id) {
+        EntradaMercadoria entrada = repository.findById(id).orElse(null);
+
+        if (entrada == null) {
+            return null;
+        }
+
+        List<ItemEntradaMercadoria> itens =
+                itemRepository.findByEntradaMercadoriaIdEntradaMercadoria(id);
+
+        return Map.of(
+                "entradaMercadoria", entrada,
+                "itens", itens
+        );
     }
 
     @Operation(summary = "Buscar entrada por ID", description = "Retorna uma entrada de mercadoria pelo seu identificador.")

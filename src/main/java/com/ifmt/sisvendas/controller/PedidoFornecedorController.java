@@ -1,6 +1,7 @@
 package com.ifmt.sisvendas.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.model.ItemPedidoFornecedor;
 import com.ifmt.sisvendas.model.PedidoFornecedor;
+import com.ifmt.sisvendas.repository.ItemPedidoFornecedorRepository;
 import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -22,14 +25,19 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/pedidos-fornecedor")
 @Tag(
         name = "Pedidos ao Fornecedor",
-        description = "Operações de cadastro e manutenção dos pedidos enviados aos fornecedores."
+        description = "Operações de cadastro, manutenção e consulta dos pedidos enviados aos fornecedores."
 )
 public class PedidoFornecedorController {
 
     private final PedidoFornecedorRepository repository;
+    private final ItemPedidoFornecedorRepository itemRepository;
 
-    public PedidoFornecedorController(PedidoFornecedorRepository repository) {
+    public PedidoFornecedorController(
+            PedidoFornecedorRepository repository,
+            ItemPedidoFornecedorRepository itemRepository
+    ) {
         this.repository = repository;
+        this.itemRepository = itemRepository;
     }
 
     @Operation(
@@ -53,6 +61,31 @@ public class PedidoFornecedorController {
     @PostMapping
     public PedidoFornecedor cadastrar(@RequestBody PedidoFornecedor pedidoFornecedor) {
         return repository.save(pedidoFornecedor);
+    }
+
+    @Operation(
+            summary = "Buscar detalhes do pedido ao fornecedor",
+            description = "Retorna os dados gerais do pedido ao fornecedor e a lista de itens vinculados ao pedido."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido ao fornecedor e itens retornados com sucesso"),
+            @ApiResponse(responseCode = "404", description = "Pedido ao fornecedor não encontrado")
+    })
+    @GetMapping("/{id}/detalhes")
+    public Map<String, Object> buscarDetalhes(@PathVariable Integer id) {
+        PedidoFornecedor pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        List<ItemPedidoFornecedor> itens =
+                itemRepository.findByPedidoFornecedorIdPedidoFornecedor(id);
+
+        return Map.of(
+                "pedidoFornecedor", pedido,
+                "itens", itens
+        );
     }
 
     @Operation(

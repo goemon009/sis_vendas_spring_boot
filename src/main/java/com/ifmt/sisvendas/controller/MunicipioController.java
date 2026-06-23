@@ -17,9 +17,16 @@ import com.ifmt.sisvendas.model.Municipio;
 import com.ifmt.sisvendas.model.Regiao;
 import com.ifmt.sisvendas.repository.MunicipioRepository;
 import com.ifmt.sisvendas.repository.RegiaoRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/municipios")
+@Tag(
+        name = "Municípios",
+        description = "Operações de cadastro, manutenção e consulta de municípios."
+)
 public class MunicipioController {
 
     private final MunicipioRepository repository;
@@ -47,6 +54,16 @@ public class MunicipioController {
         municipio.setRegiao(regiao);
 
         return ResponseEntity.ok(repository.saveAndFlush(municipio));
+    }
+
+    @Operation(
+            summary = "Listar municípios atendidos por promotor",
+            description = "Retorna os municípios dos clientes vinculados a um promotor de venda, ordenados por nome."
+    )
+    @ApiResponse(responseCode = "200", description = "Municípios retornados com sucesso")
+    @GetMapping("/promotor/{idPromotor}")
+    public List<Municipio> listarPorPromotor(@PathVariable Integer idPromotor) {
+        return repository.buscarMunicipiosPorPromotor(idPromotor);
     }
 
     @GetMapping("/{id}")
