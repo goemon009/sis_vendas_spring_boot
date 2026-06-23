@@ -56,6 +56,19 @@ public class ClienteController {
     }
 
     @Operation(
+            summary = "Buscar cliente por CNPJ",
+            description = "Retorna os dados de um cliente pelo CNPJ informado."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
+            @ApiResponse(responseCode = "404", description = "Cliente não encontrado")
+    })
+    @GetMapping("/cnpj/{cnpj}")
+    public Cliente buscarPorCnpj(@PathVariable String cnpj) {
+        return repository.findByCnpj(cnpj).orElse(null);
+    }
+
+    @Operation(
             summary = "Buscar cliente por ID",
             description = "Retorna os dados de um cliente pelo seu identificador."
     )

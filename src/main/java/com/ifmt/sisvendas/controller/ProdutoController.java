@@ -56,6 +56,36 @@ public class ProdutoController {
     }
 
     @Operation(
+            summary = "Listar produtos por categoria ordenados por nome",
+            description = "Retorna todos os produtos de uma determinada categoria, ordenados alfabeticamente pelo nome do produto."
+    )
+    @ApiResponse(responseCode = "200", description = "Produtos retornados com sucesso")
+    @GetMapping("/categoria/{idCategoria}/ordenados-por-nome")
+    public List<Produto> listarPorCategoriaOrdenadoPorNome(@PathVariable Integer idCategoria) {
+        return repository.findByCategoriaProdutoIdCategoriaProdutoOrderByNomeAsc(idCategoria);
+    }
+
+    @Operation(
+            summary = "Listar produtos por categoria ordenados por estoque",
+            description = "Retorna todos os produtos de uma determinada categoria, ordenados em ordem decrescente pela quantidade em estoque."
+    )
+    @ApiResponse(responseCode = "200", description = "Produtos retornados com sucesso")
+    @GetMapping("/categoria/{idCategoria}/ordenados-por-estoque")
+    public List<Produto> listarPorCategoriaOrdenadoPorEstoque(@PathVariable Integer idCategoria) {
+        return repository.findByCategoriaProdutoIdCategoriaProdutoOrderByQtdEstoqueDesc(idCategoria);
+    }
+
+    @Operation(
+            summary = "Listar produtos abaixo do estoque mínimo",
+            description = "Retorna todos os produtos cuja quantidade em estoque está abaixo da quantidade mínima configurada."
+    )
+    @ApiResponse(responseCode = "200", description = "Produtos retornados com sucesso")
+    @GetMapping("/estoque-abaixo-minimo")
+    public List<Produto> listarAbaixoDoEstoqueMinimo() {
+        return repository.buscarProdutosAbaixoDoEstoqueMinimo();
+    }
+
+    @Operation(
             summary = "Buscar produto por ID",
             description = "Retorna os dados de um produto pelo seu identificador."
     )

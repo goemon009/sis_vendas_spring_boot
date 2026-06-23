@@ -56,6 +56,16 @@ public class CategoriaProdutoController {
     }
 
     @Operation(
+            summary = "Listar categorias ordenadas por nome",
+            description = "Retorna todas as categorias de produto cadastradas, ordenadas alfabeticamente pelo nome."
+    )
+    @ApiResponse(responseCode = "200", description = "Categorias retornadas com sucesso")
+    @GetMapping("/ordenadas-por-nome")
+    public List<CategoriaProduto> listarOrdenadasPorNome() {
+        return repository.findAllByOrderByNomeAsc();
+    }
+
+    @Operation(
             summary = "Buscar categoria por ID",
             description = "Retorna os dados de uma categoria de produto pelo seu identificador."
     )

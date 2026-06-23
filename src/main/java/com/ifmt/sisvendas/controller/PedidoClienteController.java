@@ -58,6 +58,20 @@ public class PedidoClienteController {
         return repository.save(pedidoCliente);
     }
 
+    @Operation(
+            summary = "Listar pedidos por situação",
+            description = """
+                    Retorna todos os pedidos de cliente filtrados por situação.
+                    Situações previstas: SOLICITADO, APROVADO_ESTOQUE, PENDENTE_ESTOQUE,
+                    APROVADO_VENDA, REPROVADO_VENDA, PEDIDO_PROGRAMADO e PROCESSADO.
+                    """
+    )
+    @ApiResponse(responseCode = "200", description = "Pedidos retornados com sucesso")
+    @GetMapping("/status/{status}")
+    public List<PedidoCliente> listarPorStatus(@PathVariable String status) {
+        return repository.findByStatusOrderByDtSolicitacaoAsc(status);
+    }
+
     @Operation(summary = "Buscar pedido de cliente por ID", description = "Retorna um pedido de cliente pelo seu identificador.")
     @ApiResponse(responseCode = "200", description = "Pedido encontrado")
     @ApiResponse(responseCode = "404", description = "Pedido não encontrado")
