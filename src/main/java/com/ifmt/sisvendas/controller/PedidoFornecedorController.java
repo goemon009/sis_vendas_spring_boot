@@ -1,6 +1,7 @@
 package com.ifmt.sisvendas.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.model.ItemPedidoFornecedor;
 import com.ifmt.sisvendas.model.PedidoFornecedor;
+import com.ifmt.sisvendas.repository.ItemPedidoFornecedorRepository;
 import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
 
 @RestController
@@ -19,9 +22,13 @@ import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
 public class PedidoFornecedorController {
 
     private final PedidoFornecedorRepository repository;
+    private final ItemPedidoFornecedorRepository itemRepository;
 
-    public PedidoFornecedorController(PedidoFornecedorRepository repository) {
+    public PedidoFornecedorController(
+            PedidoFornecedorRepository repository,
+            ItemPedidoFornecedorRepository itemRepository) {
         this.repository = repository;
+        this.itemRepository = itemRepository;
     }
 
     @GetMapping
@@ -37,6 +44,23 @@ public class PedidoFornecedorController {
     @GetMapping("/{id}")
     public PedidoFornecedor buscarPorId(@PathVariable Integer id) {
         return repository.findById(id).orElse(null);
+    }
+
+    @GetMapping("/{id}/detalhes")
+    public Map<String, Object> buscarPedidoFornecedorComItens(@PathVariable Integer id) {
+        PedidoFornecedor pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        List<ItemPedidoFornecedor> itens =
+                itemRepository.findByPedidoFornecedorIdPedidoFornecedor(id);
+
+        return Map.of(
+                "pedido", pedido,
+                "itens", itens
+        );
     }
 
     @PutMapping("/{id}")

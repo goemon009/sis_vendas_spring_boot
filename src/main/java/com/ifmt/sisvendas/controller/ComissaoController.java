@@ -1,5 +1,6 @@
 package com.ifmt.sisvendas.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ifmt.sisvendas.model.Comissao;
@@ -22,6 +24,21 @@ public class ComissaoController {
 
     public ComissaoController(ComissaoRepository repository) {
         this.repository = repository;
+    }
+
+    @GetMapping("/status/{status}/promotor/{idPromotor}")
+    public List<Comissao> listarPorStatusPromotorEPeriodo(
+            @PathVariable String status,
+            @PathVariable Integer idPromotor,
+            @RequestParam LocalDate dataInicio,
+            @RequestParam LocalDate dataFim) {
+
+        return repository.findByStatusAndPromotorIdPromotorAndDataBetween(
+                status,
+                idPromotor,
+                dataInicio,
+                dataFim
+        );
     }
 
     @GetMapping
