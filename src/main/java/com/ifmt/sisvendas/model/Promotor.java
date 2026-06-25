@@ -61,3 +61,4 @@ public class Promotor {
         this.regiao = regiao;
     }
 }
+}

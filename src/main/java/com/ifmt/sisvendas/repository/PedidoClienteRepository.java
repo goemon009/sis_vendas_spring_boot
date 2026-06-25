@@ -17,4 +17,5 @@ public interface PedidoClienteRepository
             LocalDate dataInicio,
             LocalDate dataFim
     );
+public interface PedidoClienteRepository extends JpaRepository<PedidoCliente, Integer> {
 }

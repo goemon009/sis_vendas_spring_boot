@@ -2,6 +2,9 @@ package com.ifmt.sisvendas.controller;
 
 import java.util.List;
 
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +30,8 @@ public class MunicipioController {
     public MunicipioController(
             MunicipioRepository repository,
             RegiaoRepository regiaoRepository) {
+    public MunicipioController(MunicipioRepository repository,
+                               RegiaoRepository regiaoRepository) {
         this.repository = repository;
         this.regiaoRepository = regiaoRepository;
     }
@@ -48,6 +53,16 @@ public class MunicipioController {
         aplicarDadosDTO(municipio, municipioDTO, regiao);
 
         return repository.save(municipio);
+    public ResponseEntity<?> cadastrar(@RequestBody Municipio municipio) {
+        Regiao regiao = buscarRegiao(municipio);
+
+        if (regiao == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Regiao invalida ou inexistente."));
+        }
+
+        municipio.setRegiao(regiao);
+
+        return ResponseEntity.ok(repository.saveAndFlush(municipio));
     }
 
     @GetMapping("/{id}")
@@ -72,6 +87,22 @@ public class MunicipioController {
         aplicarDadosDTO(municipio, municipioDTO, regiao);
 
         return repository.save(municipio);
+    public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody Municipio dados) {
+        Municipio municipio = repository.findById(id).orElse(null);
+
+        if (municipio == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Regiao regiao = buscarRegiao(dados);
+
+        if (regiao == null) {
+            return ResponseEntity.badRequest().body(Map.of("message", "Regiao invalida ou inexistente."));
+        }
+
+        aplicarDados(municipio, dados, regiao);
+
+        return ResponseEntity.ok(repository.saveAndFlush(municipio));
     }
 
     @DeleteMapping("/{id}")
@@ -87,5 +118,19 @@ public class MunicipioController {
         municipio.setNome(municipioDTO.getNome());
         municipio.setUf(municipioDTO.getUf());
         municipio.setRegiao(regiao);
+    }
+}
+    private void aplicarDados(Municipio municipio, Municipio dados, Regiao regiao) {
+        municipio.setNome(dados.getNome());
+        municipio.setUf(dados.getUf());
+        municipio.setRegiao(regiao);
+    }
+
+    private Regiao buscarRegiao(Municipio dados) {
+        if (dados.getRegiao() == null || dados.getRegiao().getId() == null) {
+            return null;
+        }
+
+        return regiaoRepository.findById(dados.getRegiao().getId()).orElse(null);
     }
 }

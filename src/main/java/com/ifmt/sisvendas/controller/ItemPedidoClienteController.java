@@ -18,6 +18,8 @@ import com.ifmt.sisvendas.model.Produto;
 import com.ifmt.sisvendas.repository.ItemPedidoClienteRepository;
 import com.ifmt.sisvendas.repository.PedidoClienteRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
+import com.ifmt.sisvendas.model.ItemPedidoCliente;
+import com.ifmt.sisvendas.repository.ItemPedidoClienteRepository;
 
 @RestController
 @RequestMapping("/itens-pedido-cliente")
@@ -34,6 +36,9 @@ public class ItemPedidoClienteController {
         this.repository = repository;
         this.pedidoClienteRepository = pedidoClienteRepository;
         this.produtoRepository = produtoRepository;
+
+    public ItemPedidoClienteController(ItemPedidoClienteRepository repository) {
+        this.repository = repository;
     }
 
     @GetMapping
@@ -56,6 +61,7 @@ public class ItemPedidoClienteController {
         ItemPedidoCliente item = new ItemPedidoCliente();
         aplicarDadosDTO(item, itemDTO, pedidoCliente, produto);
 
+    public ItemPedidoCliente cadastrar(@RequestBody ItemPedidoCliente item) {
         return repository.save(item);
     }
 
@@ -69,6 +75,7 @@ public class ItemPedidoClienteController {
             @PathVariable Integer id,
             @RequestBody ItemPedidoClienteDTO itemDTO) {
 
+    public ItemPedidoCliente atualizar(@PathVariable Integer id, @RequestBody ItemPedidoCliente dados) {
         ItemPedidoCliente item = repository.findById(id).orElse(null);
 
         if (item == null) {
@@ -86,6 +93,10 @@ public class ItemPedidoClienteController {
         }
 
         aplicarDadosDTO(item, itemDTO, pedidoCliente, produto);
+        item.setQtd(dados.getQtd());
+        item.setVlUnitario(dados.getVlUnitario());
+        item.setPedidoCliente(dados.getPedidoCliente());
+        item.setProduto(dados.getProduto());
 
         return repository.save(item);
     }

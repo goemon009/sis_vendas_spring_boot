@@ -18,6 +18,7 @@ import com.ifmt.sisvendas.model.ItemPedidoFornecedor;
 import com.ifmt.sisvendas.model.PedidoFornecedor;
 import com.ifmt.sisvendas.repository.FornecedorRepository;
 import com.ifmt.sisvendas.repository.ItemPedidoFornecedorRepository;
+import com.ifmt.sisvendas.model.PedidoFornecedor;
 import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
 
 @RestController
@@ -35,6 +36,9 @@ public class PedidoFornecedorController {
         this.repository = repository;
         this.itemRepository = itemRepository;
         this.fornecedorRepository = fornecedorRepository;
+
+    public PedidoFornecedorController(PedidoFornecedorRepository repository) {
+        this.repository = repository;
     }
 
     @GetMapping
@@ -54,6 +58,7 @@ public class PedidoFornecedorController {
         PedidoFornecedor pedidoFornecedor = new PedidoFornecedor();
         aplicarDadosDTO(pedidoFornecedor, pedidoFornecedorDTO, fornecedor);
 
+    public PedidoFornecedor cadastrar(@RequestBody PedidoFornecedor pedidoFornecedor) {
         return repository.save(pedidoFornecedor);
     }
 
@@ -84,6 +89,8 @@ public class PedidoFornecedorController {
             @PathVariable Integer id,
             @RequestBody PedidoFornecedorDTO pedidoFornecedorDTO) {
 
+    @PutMapping("/{id}")
+    public PedidoFornecedor atualizar(@PathVariable Integer id, @RequestBody PedidoFornecedor dados) {
         PedidoFornecedor pedidoFornecedor = repository.findById(id).orElse(null);
 
         if (pedidoFornecedor == null) {
@@ -98,6 +105,10 @@ public class PedidoFornecedorController {
         }
 
         aplicarDadosDTO(pedidoFornecedor, pedidoFornecedorDTO, fornecedor);
+        pedidoFornecedor.setData(dados.getData());
+        pedidoFornecedor.setVlTotal(dados.getVlTotal());
+        pedidoFornecedor.setStatus(dados.getStatus());
+        pedidoFornecedor.setFornecedor(dados.getFornecedor());
 
         return repository.save(pedidoFornecedor);
     }

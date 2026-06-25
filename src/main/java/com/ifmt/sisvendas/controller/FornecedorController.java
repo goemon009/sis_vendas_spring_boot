@@ -14,6 +14,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ifmt.sisvendas.dto.FornecedorDTO;
 import com.ifmt.sisvendas.model.Fornecedor;
 import com.ifmt.sisvendas.repository.FornecedorRepository;
+import com.ifmt.sisvendas.model.Fornecedor;
+import com.ifmt.sisvendas.repository.FornecedorRepository;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/fornecedores")
@@ -37,6 +42,7 @@ public class FornecedorController {
 
         aplicarDadosDTO(fornecedor, fornecedorDTO);
 
+    public Fornecedor cadastrar(@RequestBody Fornecedor fornecedor) {
         return repository.save(fornecedor);
     }
 
@@ -52,6 +58,8 @@ public class FornecedorController {
 
         Fornecedor fornecedor =
                 repository.findById(id).orElse(null);
+    public Fornecedor atualizar(@PathVariable Integer id, @RequestBody Fornecedor dados) {
+        Fornecedor fornecedor = repository.findById(id).orElse(null);
 
         if (fornecedor == null) {
             return null;
@@ -61,6 +69,8 @@ public class FornecedorController {
                 fornecedor,
                 fornecedorDTO
         );
+        fornecedor.setNome(dados.getNome());
+        fornecedor.setCnpj(dados.getCnpj());
 
         return repository.save(fornecedor);
     }

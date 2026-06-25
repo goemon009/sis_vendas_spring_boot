@@ -40,6 +40,7 @@ public class PedidoClienteController {
             ClienteRepository clienteRepository,
             PromotorRepository promotorRepository) {
 
+            ComissaoRepository comissaoRepository) {
         this.repository = repository;
         this.itemRepository = itemRepository;
         this.produtoRepository = produtoRepository;
@@ -71,6 +72,7 @@ public class PedidoClienteController {
                 promotor
         );
 
+    public PedidoCliente cadastrar(@RequestBody PedidoCliente pedidoCliente) {
         return repository.save(pedidoCliente);
     }
 
@@ -101,6 +103,7 @@ public class PedidoClienteController {
             @PathVariable Integer id,
             @RequestBody PedidoClienteDTO pedidoClienteDTO) {
 
+    public PedidoCliente atualizar(@PathVariable Integer id, @RequestBody PedidoCliente dados) {
         PedidoCliente pedidoCliente = repository.findById(id).orElse(null);
 
         if (pedidoCliente == null) {
@@ -139,6 +142,31 @@ public class PedidoClienteController {
 
     @PutMapping("/{id}/pendente-estoque")
     public PedidoCliente pendenteEstoque(@PathVariable Integer id) {
+        pedidoCliente.setVlTotal(dados.getVlTotal());
+        pedidoCliente.setDtSolicitacao(dados.getDtSolicitacao());
+        pedidoCliente.setDtProgramacaoEntrega(dados.getDtProgramacaoEntrega());
+        pedidoCliente.setStatus(dados.getStatus());
+        pedidoCliente.setCliente(dados.getCliente());
+        pedidoCliente.setPromotor(dados.getPromotor());
+
+        return repository.save(pedidoCliente);
+    }
+
+    @PutMapping("/{id}/aprovar-estoque")
+    public PedidoCliente aprovarEstoque(@PathVariable Integer id) {
+        PedidoCliente pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        pedido.setStatus("APROVADO_ESTOQUE");
+
+        return repository.save(pedido);
+    }
+
+    @PutMapping("/{id}/pendente-estoque")
+    public PedidoCliente pendenteEstoque(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
 
         if (pedido == null) {
@@ -146,6 +174,105 @@ public class PedidoClienteController {
         }
 
         pedido.setStatus("PENDENTE_ESTOQUE");
+
+        return repository.save(pedido);
+    }
+
+    @PutMapping("/{id}/aprovar-venda")
+    public PedidoCliente aprovarVenda(@PathVariable Integer id) {
+        PedidoCliente pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        pedido.setStatus("APROVADO_VENDA");
+
+        return repository.save(pedido);
+    }
+
+    @PutMapping("/{id}/reprovar-venda")
+    public PedidoCliente reprovarVenda(@PathVariable Integer id) {
+        PedidoCliente pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        pedido.setStatus("REPROVADO_VENDA");
+
+        return repository.save(pedido);
+    }
+
+    @PutMapping("/{id}/programar")
+    public PedidoCliente programarEntrega(@PathVariable Integer id, @RequestBody PedidoCliente dados) {
+        PedidoCliente pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        pedido.setStatus("PENDENTE_ESTOQUE");
+        pedido.setStatus("PEDIDO_PROGRAMADO");
+        pedido.setDtProgramacaoEntrega(dados.getDtProgramacaoEntrega());
+
+        return repository.save(pedido);
+    }
+
+    @PutMapping("/{id}/processar")
+    public PedidoCliente processar(@PathVariable Integer id) {
+        PedidoCliente pedido = repository.findById(id).orElse(null);
+
+        if (pedido == null) {
+            return null;
+        }
+
+        if (!"PEDIDO_PROGRAMADO".equals(pedido.getStatus())) {
+            return pedido;
+        }
+
+        List<ItemPedidoCliente> itens =
+                itemRepository.findByPedidoClienteIdPedidoCliente(id);
+
+        BigDecimal valorTotalComissao = BigDecimal.ZERO;
+
+        for (ItemPedidoCliente item : itens) {
+            Produto produto = item.getProduto();
+
+            Integer estoqueAtual = produto.getQtdEstoque();
+            Integer quantidadeVendida = item.getQtd();
+
+            produto.setQtdEstoque(estoqueAtual - quantidadeVendida);
+            produtoRepository.save(produto);
+
+            BigDecimal subtotal = item.getVlUnitario()
+                    .multiply(BigDecimal.valueOf(item.getQtd()));
+
+            BigDecimal percentualComissao = produto.getPercentualComissao();
+
+            if (percentualComissao == null) {
+                percentualComissao = produto.getCategoriaProduto().getPercentualComissao();
+            }
+
+            if (percentualComissao != null) {
+                BigDecimal valorComissaoItem = subtotal
+                        .multiply(percentualComissao)
+                        .divide(BigDecimal.valueOf(100));
+
+                valorTotalComissao = valorTotalComissao.add(valorComissaoItem);
+            }
+        }
+
+        Comissao comissao = new Comissao();
+        comissao.setValor(valorTotalComissao);
+        comissao.setData(LocalDate.now());
+        comissao.setStatus("LANCADA");
+        comissao.setPromotor(pedido.getPromotor());
+        comissao.setPedidoCliente(pedido);
+
+        comissaoRepository.save(comissao);
+
+        pedido.setStatus("PROCESSADO");
 
         return repository.save(pedido);
     }
