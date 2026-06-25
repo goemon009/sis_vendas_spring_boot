@@ -1,6 +1,7 @@
 package com.ifmt.sisvendas.controller;
 
 import java.util.List;
+
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.dto.MunicipioDTO;
 import com.ifmt.sisvendas.model.Municipio;
 import com.ifmt.sisvendas.model.Regiao;
 import com.ifmt.sisvendas.repository.MunicipioRepository;
@@ -25,6 +27,9 @@ public class MunicipioController {
     private final MunicipioRepository repository;
     private final RegiaoRepository regiaoRepository;
 
+    public MunicipioController(
+            MunicipioRepository repository,
+            RegiaoRepository regiaoRepository) {
     public MunicipioController(MunicipioRepository repository,
                                RegiaoRepository regiaoRepository) {
         this.repository = repository;
@@ -37,6 +42,17 @@ public class MunicipioController {
     }
 
     @PostMapping
+    public Municipio cadastrar(@RequestBody MunicipioDTO municipioDTO) {
+        Regiao regiao = regiaoRepository.findById(municipioDTO.getIdRegiao()).orElse(null);
+
+        if (regiao == null) {
+            return null;
+        }
+
+        Municipio municipio = new Municipio();
+        aplicarDadosDTO(municipio, municipioDTO, regiao);
+
+        return repository.save(municipio);
     public ResponseEntity<?> cadastrar(@RequestBody Municipio municipio) {
         Regiao regiao = buscarRegiao(municipio);
 
@@ -55,6 +71,22 @@ public class MunicipioController {
     }
 
     @PutMapping("/{id}")
+    public Municipio atualizar(@PathVariable Integer id, @RequestBody MunicipioDTO municipioDTO) {
+        Municipio municipio = repository.findById(id).orElse(null);
+
+        if (municipio == null) {
+            return null;
+        }
+
+        Regiao regiao = regiaoRepository.findById(municipioDTO.getIdRegiao()).orElse(null);
+
+        if (regiao == null) {
+            return null;
+        }
+
+        aplicarDadosDTO(municipio, municipioDTO, regiao);
+
+        return repository.save(municipio);
     public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody Municipio dados) {
         Municipio municipio = repository.findById(id).orElse(null);
 
@@ -78,6 +110,16 @@ public class MunicipioController {
         repository.deleteById(id);
     }
 
+    private void aplicarDadosDTO(
+            Municipio municipio,
+            MunicipioDTO municipioDTO,
+            Regiao regiao) {
+
+        municipio.setNome(municipioDTO.getNome());
+        municipio.setUf(municipioDTO.getUf());
+        municipio.setRegiao(regiao);
+    }
+}
     private void aplicarDados(Municipio municipio, Municipio dados, Regiao regiao) {
         municipio.setNome(dados.getNome());
         municipio.setUf(dados.getUf());

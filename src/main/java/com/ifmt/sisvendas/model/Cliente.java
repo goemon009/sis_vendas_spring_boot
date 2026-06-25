@@ -38,6 +38,7 @@ public class Cliente {
     private Promotor promotor;
 
     @ManyToOne
+    @JoinColumn(name = "id_municipio")
     @JoinColumn(name = "id_municipio", nullable = false)
     private Municipio municipio;
 

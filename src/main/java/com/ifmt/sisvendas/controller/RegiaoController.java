@@ -11,13 +11,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.dto.RegiaoDTO;
 import com.ifmt.sisvendas.model.Regiao;
 import com.ifmt.sisvendas.repository.RegiaoRepository;
 
 @RestController
 @RequestMapping("/regioes")
 public class RegiaoController {
-    
+
     private final RegiaoRepository repository;
 
     public RegiaoController(RegiaoRepository repository) {
@@ -30,24 +31,27 @@ public class RegiaoController {
     }
 
     @PostMapping
-    public Regiao cadastrar(@RequestBody Regiao regiao){
+    public Regiao cadastrar(@RequestBody RegiaoDTO regiaoDTO) {
+        Regiao regiao = new Regiao();
+        aplicarDadosDTO(regiao, regiaoDTO);
+
         return repository.save(regiao);
     }
-    
+
     @GetMapping("/{id}")
     public Regiao buscarPorId(@PathVariable Integer id) {
         return repository.findById(id).orElse(null);
     }
 
     @PutMapping("/{id}")
-    public Regiao atualizar(@PathVariable Integer id, @RequestBody Regiao dados) {
+    public Regiao atualizar(@PathVariable Integer id, @RequestBody RegiaoDTO regiaoDTO) {
         Regiao regiao = repository.findById(id).orElse(null);
 
         if (regiao == null) {
             return null;
         }
 
-        regiao.setNome(dados.getNome());
+        aplicarDadosDTO(regiao, regiaoDTO);
 
         return repository.save(regiao);
     }
@@ -55,5 +59,9 @@ public class RegiaoController {
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
+    }
+
+    private void aplicarDadosDTO(Regiao regiao, RegiaoDTO regiaoDTO) {
+        regiao.setNome(regiaoDTO.getNome());
     }
 }

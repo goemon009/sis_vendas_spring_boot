@@ -1,63 +1,22 @@
-package com.ifmt.sisvendas.model;
+package com.ifmt.sisvendas.dto;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import tools.jackson.databind.JsonNode;
 
-@Entity
-@Table(name = "produto")
-public class Produto {
+public class ProdutoDTO {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_produto")
-    private Integer idProduto;
-
-    @Column(name = "nome", nullable = false, length = 100)
     private String nome;
-
-    @Column(name = "vl_custo", nullable = false)
     private BigDecimal vlCusto;
-
-    @Column(name = "qtd_estoque", nullable = false)
     private Integer qtdEstoque;
-
-    @Column(name = "qntd_reservada_produto", nullable = false)
     private Integer qtdReservadaProduto;
-
-    @Column(name = "qntd_min_estoque", nullable = false)
     private Integer qtdMinEstoque;
-
-    @Column(name = "qntd_max_estoque")
     private Integer qtdMaxEstoque;
-
-    @Column(name = "percentual_comissao")
     private BigDecimal percentualComissao;
-
-    @Column(name = "percentual_promocao")
     private BigDecimal percentualPromocao;
-
-    @Column(name = "margem_lucro", nullable = false)
     private BigDecimal margemLucro;
-
-    @ManyToOne
-    @JoinColumn(name = "id_categoria_produto", nullable = false)
-    private CategoriaProduto categoriaProduto;
-
-    public Integer getIdProduto() {
-        return idProduto;
-    }
-
-    public void setIdProduto(Integer idProduto) {
-        this.idProduto = idProduto;
-    }
+    private Integer idCategoriaProduto;
+    private JsonNode categoriaProduto;
 
     public String getNome() {
         return nome;
@@ -92,6 +51,10 @@ public class Produto {
         this.qtdReservadaProduto = qtdReservadaProduto;
     }
 
+    public void setQntdReservadaProduto(Integer qntdReservadaProduto) {
+        this.qtdReservadaProduto = qntdReservadaProduto;
+    }
+
     public Integer getQtdMinEstoque() {
         return qtdMinEstoque;
     }
@@ -100,12 +63,20 @@ public class Produto {
         this.qtdMinEstoque = qtdMinEstoque;
     }
 
+    public void setQntdMinEstoque(Integer qntdMinEstoque) {
+        this.qtdMinEstoque = qntdMinEstoque;
+    }
+
     public Integer getQtdMaxEstoque() {
         return qtdMaxEstoque;
     }
 
     public void setQtdMaxEstoque(Integer qtdMaxEstoque) {
         this.qtdMaxEstoque = qtdMaxEstoque;
+    }
+
+    public void setQntdMaxEstoque(Integer qntdMaxEstoque) {
+        this.qtdMaxEstoque = qntdMaxEstoque;
     }
 
     public BigDecimal getPercentualComissao() {
@@ -132,16 +103,19 @@ public class Produto {
         this.margemLucro = margemLucro;
     }
 
-    public CategoriaProduto getCategoriaProduto() {
+    public Integer getIdCategoriaProduto() {
+        return idCategoriaProduto;
+    }
+
+    public void setIdCategoriaProduto(Integer idCategoriaProduto) {
+        this.idCategoriaProduto = idCategoriaProduto;
+    }
+
+    public JsonNode getCategoriaProduto() {
         return categoriaProduto;
     }
 
-    public void setCategoriaProduto(CategoriaProduto categoriaProduto) {
+    public void setCategoriaProduto(JsonNode categoriaProduto) {
         this.categoriaProduto = categoriaProduto;
     }
-
-    public void setQtdReservadaProduto(Integer qtdReservadaProduto) {
-        this.qntdReservadaProduto = qtdReservadaProduto;
-    }
-}
 }

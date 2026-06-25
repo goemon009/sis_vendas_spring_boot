@@ -1,0 +1,8 @@
+@echo off
+setlocal
+
+set "JAVA_HOME=C:\Program Files\Java\latest\jdk-21"
+set "PATH=%JAVA_HOME%\bin;%PATH%"
+
+call mvnw.cmd spring-boot:run
+
