@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ifmt.sisvendas.dto.ProdutoRequest;
+import com.ifmt.sisvendas.dto.ProdutoDTO;
 import com.ifmt.sisvendas.model.CategoriaProduto;
 import com.ifmt.sisvendas.model.Produto;
 import com.ifmt.sisvendas.repository.CategoriaProdutoRepository;
@@ -28,7 +28,9 @@ public class ProdutoController {
     private final ProdutoRepository repository;
     private final CategoriaProdutoRepository categoriaRepository;
 
-    public ProdutoController(ProdutoRepository repository, CategoriaProdutoRepository categoriaRepository) {
+    public ProdutoController(
+            ProdutoRepository repository,
+            CategoriaProdutoRepository categoriaRepository) {
         this.repository = repository;
         this.categoriaRepository = categoriaRepository;
     }
@@ -39,15 +41,16 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody ProdutoRequest dados) {
-        CategoriaProduto categoria = buscarCategoria(dados);
+    public ResponseEntity<?> cadastrar(@RequestBody ProdutoDTO produtoDTO) {
+        CategoriaProduto categoria = buscarCategoria(produtoDTO);
 
         if (categoria == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "CategoriaProduto invalida ou inexistente."));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "CategoriaProduto invalida ou inexistente."));
         }
 
         Produto produto = new Produto();
-        aplicarDados(produto, dados, categoria);
+        aplicarDadosDTO(produto, produtoDTO, categoria);
 
         return ResponseEntity.ok(repository.save(produto));
     }
@@ -58,22 +61,38 @@ public class ProdutoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody ProdutoRequest dados) {
+    public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
         Produto produto = repository.findById(id).orElse(null);
 
         if (produto == null) {
             return ResponseEntity.notFound().build();
         }
 
-        CategoriaProduto categoria = buscarCategoria(dados);
+        CategoriaProduto categoria = buscarCategoria(produtoDTO);
 
         if (categoria == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "CategoriaProduto invalida ou inexistente."));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", "CategoriaProduto invalida ou inexistente."));
         }
 
-        aplicarDados(produto, dados, categoria);
+        aplicarDadosDTO(produto, produtoDTO, categoria);
 
         return ResponseEntity.ok(repository.save(produto));
+    }
+
+    @GetMapping("/categoria/{idCategoria}")
+    public List<Produto> listarPorCategoriaOrdenadoPorNome(@PathVariable Integer idCategoria) {
+        return repository.findByCategoriaProdutoIdCategoriaProdutoOrderByNomeAsc(idCategoria);
+    }
+
+    @GetMapping("/categoria/{idCategoria}/estoque-desc")
+    public List<Produto> listarPorCategoriaOrdenadoPorEstoqueDesc(@PathVariable Integer idCategoria) {
+        return repository.findByCategoriaProdutoIdCategoriaProdutoOrderByQtdEstoqueDesc(idCategoria);
+    }
+
+    @GetMapping("/estoque-baixo")
+    public List<Produto> listarProdutosAbaixoEstoqueMinimo() {
+        return repository.buscarProdutosAbaixoDoEstoqueMinimo();
     }
 
     @DeleteMapping("/{id}")
@@ -81,21 +100,25 @@ public class ProdutoController {
         repository.deleteById(id);
     }
 
-    private void aplicarDados(Produto produto, ProdutoRequest dados, CategoriaProduto categoria) {
-        produto.setNome(dados.getNome());
-        produto.setVlCusto(dados.getVlCusto());
-        produto.setQtdEstoque(dados.getQtdEstoque());
-        produto.setQntdReservadaProduto(dados.getQntdReservadaProduto());
-        produto.setQntdMinEstoque(dados.getQntdMinEstoque());
-        produto.setQntdMaxEstoque(dados.getQntdMaxEstoque());
-        produto.setPercentualComissao(dados.getPercentualComissao());
-        produto.setPercentualPromocao(dados.getPercentualPromocao());
-        produto.setMargemLucro(dados.getMargemLucro());
+    private void aplicarDadosDTO(
+            Produto produto,
+            ProdutoDTO produtoDTO,
+            CategoriaProduto categoria) {
+
+        produto.setNome(produtoDTO.getNome());
+        produto.setVlCusto(produtoDTO.getVlCusto());
+        produto.setQtdEstoque(produtoDTO.getQtdEstoque());
+        produto.setQtdReservadaProduto(produtoDTO.getQtdReservadaProduto());
+        produto.setQntdMinEstoque(produtoDTO.getQtdMinEstoque());
+        produto.setQntdMaxEstoque(produtoDTO.getQtdMaxEstoque());
+        produto.setPercentualComissao(produtoDTO.getPercentualComissao());
+        produto.setPercentualPromocao(produtoDTO.getPercentualPromocao());
+        produto.setMargemLucro(produtoDTO.getMargemLucro());
         produto.setCategoriaProduto(categoria);
     }
 
-    private CategoriaProduto buscarCategoria(ProdutoRequest dados) {
-        Integer idCategoriaProduto = extrairIdCategoria(dados);
+    private CategoriaProduto buscarCategoria(ProdutoDTO produtoDTO) {
+        Integer idCategoriaProduto = extrairIdCategoria(produtoDTO);
 
         if (idCategoriaProduto == null) {
             return null;
@@ -104,12 +127,12 @@ public class ProdutoController {
         return categoriaRepository.findById(idCategoriaProduto).orElse(null);
     }
 
-    private Integer extrairIdCategoria(ProdutoRequest dados) {
-        if (dados.getIdCategoriaProduto() != null) {
-            return dados.getIdCategoriaProduto();
+    private Integer extrairIdCategoria(ProdutoDTO produtoDTO) {
+        if (produtoDTO.getIdCategoriaProduto() != null) {
+            return produtoDTO.getIdCategoriaProduto();
         }
 
-        JsonNode categoriaNode = dados.getCategoriaProduto();
+        JsonNode categoriaNode = produtoDTO.getCategoriaProduto();
         if (categoriaNode == null || categoriaNode.isNull()) {
             return null;
         }
@@ -141,5 +164,4 @@ public class ProdutoController {
 
         return null;
     }
-
 }

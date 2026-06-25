@@ -1,6 +1,13 @@
 package com.ifmt.sisvendas.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "cliente")
@@ -29,6 +36,10 @@ public class Cliente {
     @ManyToOne
     @JoinColumn(name = "id_promotor")
     private Promotor promotor;
+
+    @ManyToOne
+    @JoinColumn(name = "id_municipio")
+    private Municipio municipio;
 
     public Integer getIdCliente() {
         return idCliente;
@@ -84,5 +95,13 @@ public class Cliente {
 
     public void setPromotor(Promotor promotor) {
         this.promotor = promotor;
+    }
+
+    public Municipio getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(Municipio municipio) {
+        this.municipio = municipio;
     }
 }

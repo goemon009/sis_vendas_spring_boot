@@ -1,9 +1,7 @@
 package com.ifmt.sisvendas.controller;
 
 import java.util.List;
-import java.util.Map;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.dto.MunicipioDTO;
 import com.ifmt.sisvendas.model.Municipio;
 import com.ifmt.sisvendas.model.Regiao;
 import com.ifmt.sisvendas.repository.MunicipioRepository;
@@ -25,8 +24,9 @@ public class MunicipioController {
     private final MunicipioRepository repository;
     private final RegiaoRepository regiaoRepository;
 
-    public MunicipioController(MunicipioRepository repository,
-                               RegiaoRepository regiaoRepository) {
+    public MunicipioController(
+            MunicipioRepository repository,
+            RegiaoRepository regiaoRepository) {
         this.repository = repository;
         this.regiaoRepository = regiaoRepository;
     }
@@ -37,16 +37,17 @@ public class MunicipioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody Municipio municipio) {
-        Regiao regiao = buscarRegiao(municipio);
+    public Municipio cadastrar(@RequestBody MunicipioDTO municipioDTO) {
+        Regiao regiao = regiaoRepository.findById(municipioDTO.getIdRegiao()).orElse(null);
 
         if (regiao == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Regiao invalida ou inexistente."));
+            return null;
         }
 
-        municipio.setRegiao(regiao);
+        Municipio municipio = new Municipio();
+        aplicarDadosDTO(municipio, municipioDTO, regiao);
 
-        return ResponseEntity.ok(repository.saveAndFlush(municipio));
+        return repository.save(municipio);
     }
 
     @GetMapping("/{id}")
@@ -55,22 +56,22 @@ public class MunicipioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody Municipio dados) {
+    public Municipio atualizar(@PathVariable Integer id, @RequestBody MunicipioDTO municipioDTO) {
         Municipio municipio = repository.findById(id).orElse(null);
 
         if (municipio == null) {
-            return ResponseEntity.notFound().build();
+            return null;
         }
 
-        Regiao regiao = buscarRegiao(dados);
+        Regiao regiao = regiaoRepository.findById(municipioDTO.getIdRegiao()).orElse(null);
 
         if (regiao == null) {
-            return ResponseEntity.badRequest().body(Map.of("message", "Regiao invalida ou inexistente."));
+            return null;
         }
 
-        aplicarDados(municipio, dados, regiao);
+        aplicarDadosDTO(municipio, municipioDTO, regiao);
 
-        return ResponseEntity.ok(repository.saveAndFlush(municipio));
+        return repository.save(municipio);
     }
 
     @DeleteMapping("/{id}")
@@ -78,17 +79,13 @@ public class MunicipioController {
         repository.deleteById(id);
     }
 
-    private void aplicarDados(Municipio municipio, Municipio dados, Regiao regiao) {
-        municipio.setNome(dados.getNome());
-        municipio.setUf(dados.getUf());
+    private void aplicarDadosDTO(
+            Municipio municipio,
+            MunicipioDTO municipioDTO,
+            Regiao regiao) {
+
+        municipio.setNome(municipioDTO.getNome());
+        municipio.setUf(municipioDTO.getUf());
         municipio.setRegiao(regiao);
-    }
-
-    private Regiao buscarRegiao(Municipio dados) {
-        if (dados.getRegiao() == null || dados.getRegiao().getId() == null) {
-            return null;
-        }
-
-        return regiaoRepository.findById(dados.getRegiao().getId()).orElse(null);
     }
 }

@@ -138,4 +138,8 @@ public class Produto {
     public void setCategoriaProduto(CategoriaProduto categoriaProduto) {
         this.categoriaProduto = categoriaProduto;
     }
+
+    public void setQtdReservadaProduto(Integer qtdReservadaProduto) {
+        this.qntdReservadaProduto = qtdReservadaProduto;
+    }
 }

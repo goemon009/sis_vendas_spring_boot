@@ -11,57 +11,50 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.ifmt.sisvendas.dto.RegiaoDTO;
-import com.ifmt.sisvendas.model.Regiao;
-import com.ifmt.sisvendas.repository.RegiaoRepository;
+import com.ifmt.sisvendas.model.FormaPagamento;
+import com.ifmt.sisvendas.repository.FormaPagamentoRepository;
 
 @RestController
-@RequestMapping("/regioes")
-public class RegiaoController {
+@RequestMapping("/formas-pagamento")
+public class FormaPagamentoController {
 
-    private final RegiaoRepository repository;
+    private final FormaPagamentoRepository repository;
 
-    public RegiaoController(RegiaoRepository repository) {
+    public FormaPagamentoController(FormaPagamentoRepository repository) {
         this.repository = repository;
     }
 
     @GetMapping
-    public List<Regiao> listar() {
+    public List<FormaPagamento> listar() {
         return repository.findAll();
     }
 
     @PostMapping
-    public Regiao cadastrar(@RequestBody RegiaoDTO regiaoDTO) {
-        Regiao regiao = new Regiao();
-        aplicarDadosDTO(regiao, regiaoDTO);
-
-        return repository.save(regiao);
+    public FormaPagamento cadastrar(@RequestBody FormaPagamento formaPagamento) {
+        return repository.save(formaPagamento);
     }
 
     @GetMapping("/{id}")
-    public Regiao buscarPorId(@PathVariable Integer id) {
+    public FormaPagamento buscarPorId(@PathVariable Integer id) {
         return repository.findById(id).orElse(null);
     }
 
     @PutMapping("/{id}")
-    public Regiao atualizar(@PathVariable Integer id, @RequestBody RegiaoDTO regiaoDTO) {
-        Regiao regiao = repository.findById(id).orElse(null);
+    public FormaPagamento atualizar(@PathVariable Integer id, @RequestBody FormaPagamento dados) {
+        FormaPagamento formaPagamento = repository.findById(id).orElse(null);
 
-        if (regiao == null) {
+        if (formaPagamento == null) {
             return null;
         }
 
-        aplicarDadosDTO(regiao, regiaoDTO);
+        formaPagamento.setDescricao(dados.getDescricao());
+        formaPagamento.setTipo(dados.getTipo());
 
-        return repository.save(regiao);
+        return repository.save(formaPagamento);
     }
 
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
-    }
-
-    private void aplicarDadosDTO(Regiao regiao, RegiaoDTO regiaoDTO) {
-        regiao.setNome(regiaoDTO.getNome());
     }
 }

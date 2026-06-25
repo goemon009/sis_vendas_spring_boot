@@ -4,14 +4,14 @@ import java.math.BigDecimal;
 
 import tools.jackson.databind.JsonNode;
 
-public class ProdutoRequest {
+public class ProdutoDTO {
 
     private String nome;
     private BigDecimal vlCusto;
     private Integer qtdEstoque;
-    private Integer qntdReservadaProduto;
-    private Integer qntdMinEstoque;
-    private Integer qntdMaxEstoque;
+    private Integer qtdReservadaProduto;
+    private Integer qtdMinEstoque;
+    private Integer qtdMaxEstoque;
     private BigDecimal percentualComissao;
     private BigDecimal percentualPromocao;
     private BigDecimal margemLucro;
@@ -25,6 +25,7 @@ public class ProdutoRequest {
     public void setNome(String nome) {
         this.nome = nome;
     }
+
 
     public BigDecimal getVlCusto() {
         return vlCusto;
@@ -42,28 +43,40 @@ public class ProdutoRequest {
         this.qtdEstoque = qtdEstoque;
     }
 
-    public Integer getQntdReservadaProduto() {
-        return qntdReservadaProduto;
+    public Integer getQtdReservadaProduto() {
+        return qtdReservadaProduto;
+    }
+
+    public void setQtdReservadaProduto(Integer qtdReservadaProduto) {
+        this.qtdReservadaProduto = qtdReservadaProduto;
     }
 
     public void setQntdReservadaProduto(Integer qntdReservadaProduto) {
-        this.qntdReservadaProduto = qntdReservadaProduto;
+        this.qtdReservadaProduto = qntdReservadaProduto;
     }
 
-    public Integer getQntdMinEstoque() {
-        return qntdMinEstoque;
+    public Integer getQtdMinEstoque() {
+        return qtdMinEstoque;
+    }
+
+    public void setQtdMinEstoque(Integer qtdMinEstoque) {
+        this.qtdMinEstoque = qtdMinEstoque;
     }
 
     public void setQntdMinEstoque(Integer qntdMinEstoque) {
-        this.qntdMinEstoque = qntdMinEstoque;
+        this.qtdMinEstoque = qntdMinEstoque;
     }
 
-    public Integer getQntdMaxEstoque() {
-        return qntdMaxEstoque;
+    public Integer getQtdMaxEstoque() {
+        return qtdMaxEstoque;
+    }
+
+    public void setQtdMaxEstoque(Integer qtdMaxEstoque) {
+        this.qtdMaxEstoque = qtdMaxEstoque;
     }
 
     public void setQntdMaxEstoque(Integer qntdMaxEstoque) {
-        this.qntdMaxEstoque = qntdMaxEstoque;
+        this.qtdMaxEstoque = qntdMaxEstoque;
     }
 
     public BigDecimal getPercentualComissao() {
