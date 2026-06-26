@@ -11,10 +11,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.dto.EntradaMercadoriaDTO;
 import com.ifmt.sisvendas.model.EntradaMercadoria;
+import com.ifmt.sisvendas.model.Fornecedor;
 import com.ifmt.sisvendas.model.ItemEntradaMercadoria;
 import com.ifmt.sisvendas.model.Produto;
 import com.ifmt.sisvendas.repository.EntradaMercadoriaRepository;
+import com.ifmt.sisvendas.repository.FornecedorRepository;
 import com.ifmt.sisvendas.repository.ItemEntradaMercadoriaRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
 
@@ -25,14 +28,17 @@ public class EntradaMercadoriaController {
     private final EntradaMercadoriaRepository repository;
     private final ItemEntradaMercadoriaRepository itemRepository;
     private final ProdutoRepository produtoRepository;
+    private final FornecedorRepository fornecedorRepository;
 
     public EntradaMercadoriaController(
             EntradaMercadoriaRepository repository,
             ItemEntradaMercadoriaRepository itemRepository,
-            ProdutoRepository produtoRepository) {
+            ProdutoRepository produtoRepository,
+            FornecedorRepository fornecedorRepository) {
         this.repository = repository;
         this.itemRepository = itemRepository;
         this.produtoRepository = produtoRepository;
+        this.fornecedorRepository = fornecedorRepository;
     }
 
     @GetMapping
@@ -41,7 +47,17 @@ public class EntradaMercadoriaController {
     }
 
     @PostMapping
-    public EntradaMercadoria cadastrar(@RequestBody EntradaMercadoria entradaMercadoria) {
+    public EntradaMercadoria cadastrar(@RequestBody EntradaMercadoriaDTO entradaMercadoriaDTO) {
+        Fornecedor fornecedor =
+                fornecedorRepository.findById(entradaMercadoriaDTO.getIdFornecedor()).orElse(null);
+
+        if (fornecedor == null) {
+            return null;
+        }
+
+        EntradaMercadoria entradaMercadoria = new EntradaMercadoria();
+        aplicarDadosDTO(entradaMercadoria, entradaMercadoriaDTO, fornecedor);
+
         return repository.save(entradaMercadoria);
     }
 
@@ -51,17 +67,24 @@ public class EntradaMercadoriaController {
     }
 
     @PutMapping("/{id}")
-    public EntradaMercadoria atualizar(@PathVariable Integer id, @RequestBody EntradaMercadoria dados) {
+    public EntradaMercadoria atualizar(
+            @PathVariable Integer id,
+            @RequestBody EntradaMercadoriaDTO entradaMercadoriaDTO) {
+
         EntradaMercadoria entradaMercadoria = repository.findById(id).orElse(null);
 
         if (entradaMercadoria == null) {
             return null;
         }
 
-        entradaMercadoria.setNumeroNota(dados.getNumeroNota());
-        entradaMercadoria.setDataEntrada(dados.getDataEntrada());
-        entradaMercadoria.setStatus(dados.getStatus());
-        entradaMercadoria.setFornecedor(dados.getFornecedor());
+        Fornecedor fornecedor =
+                fornecedorRepository.findById(entradaMercadoriaDTO.getIdFornecedor()).orElse(null);
+
+        if (fornecedor == null) {
+            return null;
+        }
+
+        aplicarDadosDTO(entradaMercadoria, entradaMercadoriaDTO, fornecedor);
 
         return repository.save(entradaMercadoria);
     }
@@ -113,5 +136,16 @@ public class EntradaMercadoriaController {
         entrada.setStatus("PROCESSADA");
 
         return repository.save(entrada);
+    }
+
+    private void aplicarDadosDTO(
+            EntradaMercadoria entradaMercadoria,
+            EntradaMercadoriaDTO entradaMercadoriaDTO,
+            Fornecedor fornecedor) {
+
+        entradaMercadoria.setNumeroNota(entradaMercadoriaDTO.getNumeroNota());
+        entradaMercadoria.setDataEntrada(entradaMercadoriaDTO.getDataEntrada());
+        entradaMercadoria.setStatus(entradaMercadoriaDTO.getStatus());
+        entradaMercadoria.setFornecedor(fornecedor);
     }
 }

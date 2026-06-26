@@ -3,6 +3,10 @@ package com.ifmt.sisvendas.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ifmt.sisvendas.dto.ClienteDTO;
@@ -23,6 +28,9 @@ import com.ifmt.sisvendas.repository.PromotorRepository;
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ClienteController.class);
 
     private final ClienteRepository repository;
     private final PromotorRepository promotorRepository;
@@ -39,6 +47,7 @@ public class ClienteController {
 
     @GetMapping
     public List<Cliente> listar() {
+        logger.info("Listando todos os clientes.");
         return repository.findAll();
     }
 
@@ -48,23 +57,52 @@ public class ClienteController {
         Municipio municipio = municipioRepository.findById(clienteDTO.getIdMunicipio()).orElse(null);
 
         if (promotor == null || municipio == null) {
+            logger.warn("Tentativa de cadastro de cliente com promotor ou município inexistente.");
             return null;
         }
 
         Cliente cliente = new Cliente();
         aplicarDadosDTO(cliente, clienteDTO, promotor, municipio);
 
-        return repository.save(cliente);
+        Cliente clienteSalvo = repository.save(cliente);
+
+        logger.info("Cliente cadastrado com sucesso. ID: {}, CNPJ: {}",
+                clienteSalvo.getIdCliente(),
+                clienteSalvo.getCnpj());
+
+        return clienteSalvo;
     }
 
     @GetMapping("/{id}")
-    public Cliente buscarPorId(@PathVariable Integer id) {
-        return repository.findById(id).orElse(null);
+    public EntityModel<Cliente> buscarPorId(@PathVariable Integer id) {
+        Cliente cliente = repository.findById(id).orElse(null);
+
+        if (cliente == null) {
+            logger.warn("Cliente não encontrado. ID: {}", id);
+            return null;
+        }
+
+        logger.info("Cliente encontrado. ID: {}", id);
+
+        return EntityModel.of(
+                cliente,
+                Link.of("http://localhost:8080/clientes/" + id).withSelfRel(),
+                Link.of("http://localhost:8080/clientes").withRel("todos-clientes"),
+                Link.of("http://localhost:8080/clientes/cnpj/" + cliente.getCnpj()).withRel("buscar-por-cnpj")
+        );
     }
 
     @GetMapping("/cnpj/{cnpj}")
     public Cliente buscarPorCnpj(@PathVariable String cnpj) {
-        return repository.findByCnpj(cnpj);
+        Cliente cliente = repository.findByCnpj(cnpj);
+
+        if (cliente == null) {
+            logger.warn("Cliente não encontrado pelo CNPJ: {}", cnpj);
+            return null;
+        }
+
+        logger.info("Cliente encontrado pelo CNPJ: {}", cnpj);
+        return cliente;
     }
 
     @GetMapping("/promotor/{idPromotor}/valor-vendido")
@@ -72,6 +110,13 @@ public class ClienteController {
             @PathVariable Integer idPromotor,
             @RequestParam LocalDate dataInicio,
             @RequestParam LocalDate dataFim) {
+
+        logger.info(
+                "Consultando clientes do promotor {} por valor vendido entre {} e {}.",
+                idPromotor,
+                dataInicio,
+                dataFim
+        );
 
         return repository.buscarClientesPorPromotorOrdenadosPorValorVendido(
                 idPromotor,
@@ -85,6 +130,7 @@ public class ClienteController {
         Cliente cliente = repository.findById(id).orElse(null);
 
         if (cliente == null) {
+            logger.warn("Tentativa de atualizar cliente inexistente. ID: {}", id);
             return null;
         }
 
@@ -92,16 +138,22 @@ public class ClienteController {
         Municipio municipio = municipioRepository.findById(clienteDTO.getIdMunicipio()).orElse(null);
 
         if (promotor == null || municipio == null) {
+            logger.warn("Tentativa de atualizar cliente {} com promotor ou município inexistente.", id);
             return null;
         }
 
         aplicarDadosDTO(cliente, clienteDTO, promotor, municipio);
 
-        return repository.save(cliente);
+        Cliente clienteAtualizado = repository.save(cliente);
+
+        logger.info("Cliente atualizado com sucesso. ID: {}", id);
+
+        return clienteAtualizado;
     }
 
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
+        logger.info("Excluindo cliente. ID: {}", id);
         repository.deleteById(id);
     }
 

@@ -2,14 +2,7 @@ package com.ifmt.sisvendas.model;
 
 import java.math.BigDecimal;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "itempedidocliente")
@@ -20,18 +13,18 @@ public class ItemPedidoCliente {
     @Column(name = "id_itempedidocliente")
     private Integer idItemPedidoCliente;
 
-    @Column(name = "qtd", nullable = false)
+    @Column(name = "qtd")
     private Integer qtd;
 
-    @Column(name = "vl_unitario", nullable = false)
+    @Column(name = "vl_unitario")
     private BigDecimal vlUnitario;
 
     @ManyToOne
-    @JoinColumn(name = "id_pedidocliente", nullable = false)
+    @JoinColumn(name = "id_pedidocliente")
     private PedidoCliente pedidoCliente;
 
     @ManyToOne
-    @JoinColumn(name = "id_produto", nullable = false)
+    @JoinColumn(name = "id_produto")
     private Produto produto;
 
     public Integer getIdItemPedidoCliente() {
