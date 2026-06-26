@@ -111,8 +111,8 @@ Configuração padrão:
 
 ```properties
 spring.datasource.url=jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:sgcvp}
-spring.datasource.username=${DB_USER:???}
-spring.datasource.password=${DB_PASSWORD:???}
+spring.datasource.username=${DB_USER:postgres}
+spring.datasource.password=${DB_PASSWORD:123456}
 ```
 
 Variáveis suportadas:
@@ -157,7 +157,7 @@ Garanta que o `JAVA_HOME` esteja apontando para um JDK 21 antes de executar o co
 Se quiser sobrescrever a conexão com o banco:
 
 ```bash
-DB_HOST=localhost DB_PORT=5432 DB_NAME=sgcvp DB_USER=USUARIO DB_PASSWORD=SUASENHA ./mvnw spring-boot:run
+DB_HOST=localhost DB_PORT=5432 DB_NAME=sgcvp DB_USER=postgres DB_PASSWORD=123456 ./mvnw spring-boot:run
 ```
 
 ### Observação para ambiente WSL

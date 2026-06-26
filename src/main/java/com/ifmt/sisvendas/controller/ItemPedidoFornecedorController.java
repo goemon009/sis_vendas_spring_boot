@@ -11,17 +11,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.dto.ItemPedidoFornecedorDTO;
 import com.ifmt.sisvendas.model.ItemPedidoFornecedor;
+import com.ifmt.sisvendas.model.PedidoFornecedor;
+import com.ifmt.sisvendas.model.Produto;
 import com.ifmt.sisvendas.repository.ItemPedidoFornecedorRepository;
+import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
+import com.ifmt.sisvendas.repository.ProdutoRepository;
 
 @RestController
 @RequestMapping("/itens-pedido-fornecedor")
 public class ItemPedidoFornecedorController {
 
     private final ItemPedidoFornecedorRepository repository;
+    private final PedidoFornecedorRepository pedidoFornecedorRepository;
+    private final ProdutoRepository produtoRepository;
 
-    public ItemPedidoFornecedorController(ItemPedidoFornecedorRepository repository) {
+    public ItemPedidoFornecedorController(
+            ItemPedidoFornecedorRepository repository,
+            PedidoFornecedorRepository pedidoFornecedorRepository,
+            ProdutoRepository produtoRepository) {
         this.repository = repository;
+        this.pedidoFornecedorRepository = pedidoFornecedorRepository;
+        this.produtoRepository = produtoRepository;
     }
 
     @GetMapping
@@ -30,7 +42,20 @@ public class ItemPedidoFornecedorController {
     }
 
     @PostMapping
-    public ItemPedidoFornecedor cadastrar(@RequestBody ItemPedidoFornecedor item) {
+    public ItemPedidoFornecedor cadastrar(@RequestBody ItemPedidoFornecedorDTO itemDTO) {
+        PedidoFornecedor pedidoFornecedor =
+                pedidoFornecedorRepository.findById(itemDTO.getIdPedidoFornecedor()).orElse(null);
+
+        Produto produto =
+                produtoRepository.findById(itemDTO.getIdProduto()).orElse(null);
+
+        if (pedidoFornecedor == null || produto == null) {
+            return null;
+        }
+
+        ItemPedidoFornecedor item = new ItemPedidoFornecedor();
+        aplicarDadosDTO(item, itemDTO, pedidoFornecedor, produto);
+
         return repository.save(item);
     }
 
@@ -40,17 +65,27 @@ public class ItemPedidoFornecedorController {
     }
 
     @PutMapping("/{id}")
-    public ItemPedidoFornecedor atualizar(@PathVariable Integer id, @RequestBody ItemPedidoFornecedor dados) {
+    public ItemPedidoFornecedor atualizar(
+            @PathVariable Integer id,
+            @RequestBody ItemPedidoFornecedorDTO itemDTO) {
+
         ItemPedidoFornecedor item = repository.findById(id).orElse(null);
 
         if (item == null) {
             return null;
         }
 
-        item.setQtd(dados.getQtd());
-        item.setVlUnitario(dados.getVlUnitario());
-        item.setPedidoFornecedor(dados.getPedidoFornecedor());
-        item.setProduto(dados.getProduto());
+        PedidoFornecedor pedidoFornecedor =
+                pedidoFornecedorRepository.findById(itemDTO.getIdPedidoFornecedor()).orElse(null);
+
+        Produto produto =
+                produtoRepository.findById(itemDTO.getIdProduto()).orElse(null);
+
+        if (pedidoFornecedor == null || produto == null) {
+            return null;
+        }
+
+        aplicarDadosDTO(item, itemDTO, pedidoFornecedor, produto);
 
         return repository.save(item);
     }
@@ -58,5 +93,17 @@ public class ItemPedidoFornecedorController {
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
+    }
+
+    private void aplicarDadosDTO(
+            ItemPedidoFornecedor item,
+            ItemPedidoFornecedorDTO itemDTO,
+            PedidoFornecedor pedidoFornecedor,
+            Produto produto) {
+
+        item.setQtd(itemDTO.getQtd());
+        item.setVlUnitario(itemDTO.getVlUnitario());
+        item.setPedidoFornecedor(pedidoFornecedor);
+        item.setProduto(produto);
     }
 }

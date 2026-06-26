@@ -18,28 +18,27 @@ public class Cliente {
     @Column(name = "id_cliente")
     private Integer idCliente;
 
-    @Column(name = "razao_social", nullable = false, length = 100)
+    @Column(name = "razao_social")
     private String razaoSocial;
 
-    @Column(name = "nome_fantasia", length = 100)
+    @Column(name = "nome_fantasia")
     private String nomeFantasia;
 
-    @Column(name = "cnpj", nullable = false, length = 14)
+    @Column(name = "cnpj")
     private String cnpj;
 
-    @Column(name = "inscricao_estadual", length = 20)
+    @Column(name = "inscricao_estadual")
     private String inscricaoEstadual;
 
-    @Column(name = "endereco", length = 200)
+    @Column(name = "endereco")
     private String endereco;
 
     @ManyToOne
-    @JoinColumn(name = "id_promotor", nullable = false)
+    @JoinColumn(name = "id_promotor")
     private Promotor promotor;
 
     @ManyToOne
     @JoinColumn(name = "id_municipio")
-    @JoinColumn(name = "id_municipio", nullable = false)
     private Municipio municipio;
 
     public Integer getIdCliente() {

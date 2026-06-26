@@ -11,17 +11,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.dto.PagamentoFornecedorDTO;
 import com.ifmt.sisvendas.model.PagamentoFornecedor;
+import com.ifmt.sisvendas.model.PedidoFornecedor;
 import com.ifmt.sisvendas.repository.PagamentoFornecedorRepository;
+import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
 
 @RestController
 @RequestMapping("/pagamentos-fornecedor")
 public class PagamentoFornecedorController {
 
     private final PagamentoFornecedorRepository repository;
+    private final PedidoFornecedorRepository pedidoFornecedorRepository;
 
-    public PagamentoFornecedorController(PagamentoFornecedorRepository repository) {
+    public PagamentoFornecedorController(
+            PagamentoFornecedorRepository repository,
+            PedidoFornecedorRepository pedidoFornecedorRepository) {
         this.repository = repository;
+        this.pedidoFornecedorRepository = pedidoFornecedorRepository;
     }
 
     @GetMapping
@@ -30,7 +37,17 @@ public class PagamentoFornecedorController {
     }
 
     @PostMapping
-    public PagamentoFornecedor cadastrar(@RequestBody PagamentoFornecedor pagamentoFornecedor) {
+    public PagamentoFornecedor cadastrar(@RequestBody PagamentoFornecedorDTO pagamentoFornecedorDTO) {
+        PedidoFornecedor pedidoFornecedor =
+                pedidoFornecedorRepository.findById(pagamentoFornecedorDTO.getIdPedidoFornecedor()).orElse(null);
+
+        if (pedidoFornecedor == null) {
+            return null;
+        }
+
+        PagamentoFornecedor pagamentoFornecedor = new PagamentoFornecedor();
+        aplicarDadosDTO(pagamentoFornecedor, pagamentoFornecedorDTO, pedidoFornecedor);
+
         return repository.save(pagamentoFornecedor);
     }
 
@@ -40,18 +57,25 @@ public class PagamentoFornecedorController {
     }
 
     @PutMapping("/{id}")
-    public PagamentoFornecedor atualizar(@PathVariable Integer id, @RequestBody PagamentoFornecedor dados) {
-        PagamentoFornecedor pagamentoFornecedor = repository.findById(id).orElse(null);
+    public PagamentoFornecedor atualizar(
+            @PathVariable Integer id,
+            @RequestBody PagamentoFornecedorDTO pagamentoFornecedorDTO) {
+
+        PagamentoFornecedor pagamentoFornecedor =
+                repository.findById(id).orElse(null);
 
         if (pagamentoFornecedor == null) {
             return null;
         }
 
-        pagamentoFornecedor.setValor(dados.getValor());
-        pagamentoFornecedor.setParcelas(dados.getParcelas());
-        pagamentoFornecedor.setDtPagamento(dados.getDtPagamento());
-        pagamentoFornecedor.setStatus(dados.getStatus());
-        pagamentoFornecedor.setPedidoFornecedor(dados.getPedidoFornecedor());
+        PedidoFornecedor pedidoFornecedor =
+                pedidoFornecedorRepository.findById(pagamentoFornecedorDTO.getIdPedidoFornecedor()).orElse(null);
+
+        if (pedidoFornecedor == null) {
+            return null;
+        }
+
+        aplicarDadosDTO(pagamentoFornecedor, pagamentoFornecedorDTO, pedidoFornecedor);
 
         return repository.save(pagamentoFornecedor);
     }
@@ -59,5 +83,17 @@ public class PagamentoFornecedorController {
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
+    }
+
+    private void aplicarDadosDTO(
+            PagamentoFornecedor pagamentoFornecedor,
+            PagamentoFornecedorDTO pagamentoFornecedorDTO,
+            PedidoFornecedor pedidoFornecedor) {
+
+        pagamentoFornecedor.setValor(pagamentoFornecedorDTO.getValor());
+        pagamentoFornecedor.setParcelas(pagamentoFornecedorDTO.getParcelas());
+        pagamentoFornecedor.setDtPagamento(pagamentoFornecedorDTO.getDtPagamento());
+        pagamentoFornecedor.setStatus(pagamentoFornecedorDTO.getStatus());
+        pagamentoFornecedor.setPedidoFornecedor(pedidoFornecedor);
     }
 }

@@ -13,17 +13,30 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ifmt.sisvendas.dto.ComissaoDTO;
 import com.ifmt.sisvendas.model.Comissao;
+import com.ifmt.sisvendas.model.PedidoCliente;
+import com.ifmt.sisvendas.model.Promotor;
 import com.ifmt.sisvendas.repository.ComissaoRepository;
+import com.ifmt.sisvendas.repository.PedidoClienteRepository;
+import com.ifmt.sisvendas.repository.PromotorRepository;
 
 @RestController
 @RequestMapping("/comissoes")
 public class ComissaoController {
 
     private final ComissaoRepository repository;
+    private final PromotorRepository promotorRepository;
+    private final PedidoClienteRepository pedidoClienteRepository;
 
-    public ComissaoController(ComissaoRepository repository) {
+    public ComissaoController(
+            ComissaoRepository repository,
+            PromotorRepository promotorRepository,
+            PedidoClienteRepository pedidoClienteRepository) {
+
         this.repository = repository;
+        this.promotorRepository = promotorRepository;
+        this.pedidoClienteRepository = pedidoClienteRepository;
     }
 
     @GetMapping("/status/{status}/promotor/{idPromotor}")
@@ -47,7 +60,26 @@ public class ComissaoController {
     }
 
     @PostMapping
-    public Comissao cadastrar(@RequestBody Comissao comissao) {
+    public Comissao cadastrar(@RequestBody ComissaoDTO comissaoDTO) {
+        Promotor promotor =
+                promotorRepository.findById(comissaoDTO.getIdPromotor()).orElse(null);
+
+        PedidoCliente pedidoCliente =
+                pedidoClienteRepository.findById(comissaoDTO.getIdPedidoCliente()).orElse(null);
+
+        if (promotor == null || pedidoCliente == null) {
+            return null;
+        }
+
+        Comissao comissao = new Comissao();
+
+        aplicarDadosDTO(
+                comissao,
+                comissaoDTO,
+                promotor,
+                pedidoCliente
+        );
+
         return repository.save(comissao);
     }
 
@@ -57,18 +89,33 @@ public class ComissaoController {
     }
 
     @PutMapping("/{id}")
-    public Comissao atualizar(@PathVariable Integer id, @RequestBody Comissao dados) {
-        Comissao comissao = repository.findById(id).orElse(null);
+    public Comissao atualizar(
+            @PathVariable Integer id,
+            @RequestBody ComissaoDTO comissaoDTO) {
+
+        Comissao comissao =
+                repository.findById(id).orElse(null);
 
         if (comissao == null) {
             return null;
         }
 
-        comissao.setValor(dados.getValor());
-        comissao.setData(dados.getData());
-        comissao.setStatus(dados.getStatus());
-        comissao.setPromotor(dados.getPromotor());
-        comissao.setPedidoCliente(dados.getPedidoCliente());
+        Promotor promotor =
+                promotorRepository.findById(comissaoDTO.getIdPromotor()).orElse(null);
+
+        PedidoCliente pedidoCliente =
+                pedidoClienteRepository.findById(comissaoDTO.getIdPedidoCliente()).orElse(null);
+
+        if (promotor == null || pedidoCliente == null) {
+            return null;
+        }
+
+        aplicarDadosDTO(
+                comissao,
+                comissaoDTO,
+                promotor,
+                pedidoCliente
+        );
 
         return repository.save(comissao);
     }
@@ -77,5 +124,17 @@ public class ComissaoController {
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
     }
-}
+
+    private void aplicarDadosDTO(
+            Comissao comissao,
+            ComissaoDTO comissaoDTO,
+            Promotor promotor,
+            PedidoCliente pedidoCliente) {
+
+        comissao.setValor(comissaoDTO.getValor());
+        comissao.setData(comissaoDTO.getData());
+        comissao.setStatus(comissaoDTO.getStatus());
+        comissao.setPromotor(promotor);
+        comissao.setPedidoCliente(pedidoCliente);
+    }
 }

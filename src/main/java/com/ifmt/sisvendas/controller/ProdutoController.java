@@ -1,7 +1,9 @@
 package com.ifmt.sisvendas.controller;
 
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,19 +16,23 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ifmt.sisvendas.dto.ProdutoDTO;
 import com.ifmt.sisvendas.model.CategoriaProduto;
 import com.ifmt.sisvendas.model.Produto;
+import com.ifmt.sisvendas.repository.CategoriaProdutoRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
+
+import tools.jackson.databind.JsonNode;
 
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
 
     private final ProdutoRepository repository;
+    private final CategoriaProdutoRepository categoriaRepository;
 
     public ProdutoController(
             ProdutoRepository repository,
             CategoriaProdutoRepository categoriaRepository) {
-    public ProdutoController(ProdutoRepository repository) {
         this.repository = repository;
+        this.categoriaRepository = categoriaRepository;
     }
 
     @GetMapping
@@ -47,8 +53,6 @@ public class ProdutoController {
         aplicarDadosDTO(produto, produtoDTO, categoria);
 
         return ResponseEntity.ok(repository.save(produto));
-    public Produto cadastrar(@RequestBody Produto produto) {
-        return repository.save(produto);
     }
 
     @GetMapping("/{id}")
@@ -119,25 +123,8 @@ public class ProdutoController {
         if (idCategoriaProduto == null) {
             return null;
         }
-    public Produto atualizar(@PathVariable Integer id, @RequestBody Produto dados) {
-        Produto produto = repository.findById(id).orElse(null);
 
-        if (produto == null) {
-            return null;
-        }
-
-        produto.setNome(dados.getNome());
-        produto.setVlCusto(dados.getVlCusto());
-        produto.setQtdEstoque(dados.getQtdEstoque());
-        produto.setQtdReservadaProduto(dados.getQtdReservadaProduto());
-        produto.setQtdMinEstoque(dados.getQtdMinEstoque());
-        produto.setQtdMaxEstoque(dados.getQtdMaxEstoque());
-        produto.setPercentualComissao(dados.getPercentualComissao());
-        produto.setPercentualPromocao(dados.getPercentualPromocao());
-        produto.setMargemLucro(dados.getMargemLucro());
-        produto.setCategoriaProduto(dados.getCategoriaProduto());
-
-        return repository.save(produto);
+        return categoriaRepository.findById(idCategoriaProduto).orElse(null);
     }
 
     private Integer extrairIdCategoria(ProdutoDTO produtoDTO) {
@@ -176,10 +163,5 @@ public class ProdutoController {
         }
 
         return null;
-    }
-}
-    @DeleteMapping("/{id}")
-    public void excluir(@PathVariable Integer id) {
-        repository.deleteById(id);
     }
 }

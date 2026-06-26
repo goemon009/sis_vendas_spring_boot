@@ -30,15 +30,15 @@ public class Produto {
     private Integer qtdEstoque;
 
     @Column(name = "qntd_reservada_produto", nullable = false)
-    private Integer qtdReservadaProduto;
+    private Integer qntdReservadaProduto;
 
     @Column(name = "qntd_min_estoque", nullable = false)
-    private Integer qtdMinEstoque;
+    private Integer qntdMinEstoque;
 
-    @Column(name = "qntd_max_estoque")
-    private Integer qtdMaxEstoque;
+    @Column(name = "qntd_max_estoque", nullable = false)
+    private Integer qntdMaxEstoque;
 
-    @Column(name = "percentual_comissao")
+    @Column(name = "percentual_comissao", nullable = false)
     private BigDecimal percentualComissao;
 
     @Column(name = "percentual_promocao")
@@ -67,7 +67,6 @@ public class Produto {
         this.nome = nome;
     }
 
-
     public BigDecimal getVlCusto() {
         return vlCusto;
     }
@@ -84,28 +83,28 @@ public class Produto {
         this.qtdEstoque = qtdEstoque;
     }
 
-    public Integer getQtdReservadaProduto() {
-        return qtdReservadaProduto;
+    public Integer getQntdReservadaProduto() {
+        return qntdReservadaProduto;
     }
 
-    public void setQtdReservadaProduto(Integer qtdReservadaProduto) {
-        this.qtdReservadaProduto = qtdReservadaProduto;
+    public void setQntdReservadaProduto(Integer qntdReservadaProduto) {
+        this.qntdReservadaProduto = qntdReservadaProduto;
     }
 
-    public Integer getQtdMinEstoque() {
-        return qtdMinEstoque;
+    public Integer getQntdMinEstoque() {
+        return qntdMinEstoque;
     }
 
-    public void setQtdMinEstoque(Integer qtdMinEstoque) {
-        this.qtdMinEstoque = qtdMinEstoque;
+    public void setQntdMinEstoque(Integer qntdMinEstoque) {
+        this.qntdMinEstoque = qntdMinEstoque;
     }
 
-    public Integer getQtdMaxEstoque() {
-        return qtdMaxEstoque;
+    public Integer getQntdMaxEstoque() {
+        return qntdMaxEstoque;
     }
 
-    public void setQtdMaxEstoque(Integer qtdMaxEstoque) {
-        this.qtdMaxEstoque = qtdMaxEstoque;
+    public void setQntdMaxEstoque(Integer qntdMaxEstoque) {
+        this.qntdMaxEstoque = qntdMaxEstoque;
     }
 
     public BigDecimal getPercentualComissao() {
@@ -143,5 +142,4 @@ public class Produto {
     public void setQtdReservadaProduto(Integer qtdReservadaProduto) {
         this.qntdReservadaProduto = qtdReservadaProduto;
     }
-}
 }
