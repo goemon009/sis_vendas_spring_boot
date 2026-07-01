@@ -7,6 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa uma forma de pagamento.
+ *
+ * É utilizada para registrar como os pedidos ou compras serão pagos,
+ * como boleto, PIX, cartão de crédito ou débito.
+ */
 @Entity
 @Table(name = "formapagamento")
 public class FormaPagamento {

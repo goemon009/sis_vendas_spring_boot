@@ -12,6 +12,12 @@ import com.ifmt.sisvendas.repository.MunicipioRepository;
 import com.ifmt.sisvendas.repository.PromotorRepository;
 import com.ifmt.sisvendas.repository.RegiaoRepository;
 
+/**
+ * Controller responsável pelos endpoints REST de promotores de venda.
+ *
+ * Permite manter o cadastro de promotores e consultar os municípios
+ * atendidos por cada promotor.
+ */
 @RestController
 @RequestMapping("/promotores")
 public class PromotorController {
@@ -53,6 +59,11 @@ public class PromotorController {
         return repository.findById(id).orElse(null);
     }
 
+    /**
+     * Lista os municípios atendidos por um promotor de venda.
+     *
+     * Essa consulta representa a área de atuação comercial do promotor.
+     */
     @GetMapping("/{id}/municipios")
     public List<Municipio> listarMunicipiosAtendidos(@PathVariable Integer id) {
         Promotor promotor = repository.findById(id).orElse(null);

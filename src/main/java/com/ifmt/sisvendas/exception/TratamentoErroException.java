@@ -8,6 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * Classe usada para representar erros tratados pela API.
+ *
+ * Permite padronizar mensagens de erro retornadas ao cliente.
+ */
 @RestControllerAdvice
 public class TratamentoErroException {
 

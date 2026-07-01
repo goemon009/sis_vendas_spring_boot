@@ -9,6 +9,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa uma categoria de produto.
+ *
+ * A categoria agrupa produtos semelhantes e armazena percentuais
+ * de comissão e desconto que podem ser usados nas regras de venda.
+ */
 @Entity
 @Table(name = "categoriaproduto")
 public class CategoriaProduto {

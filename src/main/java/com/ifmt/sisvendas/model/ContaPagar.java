@@ -12,6 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa uma conta a pagar.
+ *
+ * É utilizada para registrar valores que a empresa deve pagar
+ * em função de compras realizadas a prazo.
+ */
 @Entity
 @Table(name = "contapagar")
 public class ContaPagar {

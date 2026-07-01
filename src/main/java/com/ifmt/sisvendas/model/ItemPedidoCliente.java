@@ -4,6 +4,12 @@ import java.math.BigDecimal;
 
 import jakarta.persistence.*;
 
+/**
+ * Entidade que representa um item de um pedido de cliente.
+ *
+ * Cada item vincula um produto ao pedido, registrando quantidade
+ * e valor unitário utilizado na venda.
+ */
 @Entity
 @Table(name = "itempedidocliente")
 public class ItemPedidoCliente {

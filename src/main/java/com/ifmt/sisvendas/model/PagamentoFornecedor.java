@@ -12,6 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um pagamento realizado a fornecedor.
+ *
+ * Registra informações de pagamento associadas às compras feitas
+ * pela empresa.
+ */
 @Entity
 @Table(name = "pagamentofornecedor")
 public class PagamentoFornecedor {

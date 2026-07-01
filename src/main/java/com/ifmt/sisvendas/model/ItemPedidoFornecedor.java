@@ -11,6 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um item de pedido ao fornecedor.
+ *
+ * Cada item indica o produto solicitado e a quantidade desejada
+ * no processo de compra.
+ */
 @Entity
 @Table(name = "itempedidofornecedor")
 public class ItemPedidoFornecedor {

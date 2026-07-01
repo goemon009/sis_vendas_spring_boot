@@ -34,6 +34,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * Controller responsável pelos endpoints REST de pedidos de cliente.
+ *
+ * Além das operações básicas de cadastro e consulta, concentra endpoints
+ * de mudança de status do pedido e processamento da venda.
+ */
 @RestController
 @RequestMapping("/pedidos-cliente")
 @Tag(
@@ -68,11 +74,20 @@ public class PedidoClienteController {
         this.promotorRepository = promotorRepository;
     }
 
+    /**
+     * Retorna todos os pedidos de cliente cadastrados.
+     */
     @GetMapping
     public List<PedidoCliente> listar() {
         return repository.findAll();
     }
 
+    /**
+     * Cadastra um novo pedido de cliente.
+     *
+     * Os dados são recebidos por meio de um DTO para simplificar
+     * a criação do pedido e seus relacionamentos.
+     */
     @PostMapping
     public PedidoCliente cadastrar(@RequestBody PedidoClienteDTO pedidoClienteDTO) {
         Cliente cliente = clienteRepository.findById(pedidoClienteDTO.getIdCliente()).orElse(null);
@@ -94,11 +109,20 @@ public class PedidoClienteController {
         return repository.save(pedidoCliente);
     }
 
+    /**
+     * Busca um pedido de cliente pelo identificador.
+     */
     @GetMapping("/{id}")
     public PedidoCliente buscarPorId(@PathVariable Integer id) {
         return repository.findById(id).orElse(null);
     }
 
+    /**
+     * Retorna os dados gerais do pedido junto com seus itens.
+     *
+     * Esse endpoint facilita a visualização completa de um pedido,
+     * incluindo os produtos e quantidades vinculados.
+     */
     @GetMapping("/{id}/detalhes")
     public Map<String, Object> buscarPedidoComItens(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -116,6 +140,9 @@ public class PedidoClienteController {
         );
     }
 
+    /**
+     * Atualiza os dados gerais de um pedido de cliente.
+     */
     @PutMapping("/{id}")
     public PedidoCliente atualizar(
             @PathVariable Integer id,
@@ -144,6 +171,12 @@ public class PedidoClienteController {
         return repository.save(pedidoCliente);
     }
 
+    /**
+     * Altera o status do pedido para APROVADO_ESTOQUE.
+     *
+     * Essa etapa representa a aprovação do pedido após análise
+     * de disponibilidade dos produtos em estoque.
+     */
     @PutMapping("/{id}/aprovar-estoque")
     public PedidoCliente aprovarEstoque(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -157,6 +190,12 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    /**
+     * Altera o status do pedido para PENDENTE_ESTOQUE.
+     *
+     * Esse status indica que pelo menos um item do pedido
+     * não possui estoque suficiente.
+     */
     @PutMapping("/{id}/pendente-estoque")
     public PedidoCliente pendenteEstoque(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -170,6 +209,12 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    /**
+     * Altera o status do pedido para APROVADO_VENDA.
+     *
+     * Essa etapa representa a aprovação comercial do pedido
+     * após análise das condições do cliente.
+     */
     @PutMapping("/{id}/aprovar-venda")
     public PedidoCliente aprovarVenda(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -183,6 +228,12 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    /**
+     * Altera o status do pedido para REPROVADO_VENDA.
+     *
+     * Esse status indica que o pedido não foi aprovado
+     * na análise comercial.
+     */
     @PutMapping("/{id}/reprovar-venda")
     public PedidoCliente reprovarVenda(@PathVariable Integer id) {
         PedidoCliente pedido = repository.findById(id).orElse(null);
@@ -196,6 +247,11 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    /**
+     * Programa a entrega do pedido e altera seu status para PEDIDO_PROGRAMADO.
+     *
+     * Essa etapa define a data prevista para execução ou entrega do pedido.
+     */
     @PutMapping("/{id}/programar")
     public PedidoCliente programarEntrega(
             @PathVariable Integer id,
@@ -213,6 +269,13 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    /**
+     * Processa um pedido de cliente.
+     *
+     * Essa operação representa a finalização da venda:
+     * valida o pedido, percorre seus itens, baixa o estoque dos produtos,
+     * calcula a comissão do promotor e altera o status do pedido para PROCESSADO.
+     */
     @Transactional
     @Operation(
             summary = "Processar pedido de cliente",
@@ -231,13 +294,16 @@ public class PedidoClienteController {
     public ResponseEntity<EntityModel<PedidoCliente>> processar(@PathVariable Integer id) {
         logger.info("Iniciando processamento do pedido de cliente. ID: {}", id);
 
+        // Busca o pedido informado pelo ID recebido na URL.
         PedidoCliente pedido = repository.findById(id).orElse(null);
 
+        // Valida se o pedido existe antes de executar qualquer regra de negócio.
         if (pedido == null) {
             logger.warn("Pedido de cliente nao encontrado para processamento. ID: {}", id);
             return ResponseEntity.notFound().build();
         }
 
+        // O pedido só pode ser processado após ter sido programado.
         if (!"PEDIDO_PROGRAMADO".equals(pedido.getStatus())) {
             logger.warn(
                     "Pedido {} nao pode ser processado. Status atual: {}",
@@ -253,6 +319,7 @@ public class PedidoClienteController {
             return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
         }
 
+        // Busca os itens vinculados ao pedido.
         List<ItemPedidoCliente> itens =
                 itemRepository.findByPedidoClienteIdPedidoCliente(id);
 
@@ -261,6 +328,7 @@ public class PedidoClienteController {
             return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
         }
 
+        // Valida os itens antes de alterar estoque ou gerar comissão.
         for (ItemPedidoCliente item : itens) {
             Produto produto = item.getProduto();
 
@@ -294,6 +362,7 @@ public class PedidoClienteController {
             Integer estoqueAtual = produto.getQtdEstoque();
             Integer quantidadeVendida = item.getQtd();
 
+            // Baixa o estoque dos produtos vendidos.
             produto.setQtdEstoque(estoqueAtual - quantidadeVendida);
             produtoRepository.save(produto);
 
@@ -307,8 +376,10 @@ public class PedidoClienteController {
             BigDecimal subtotal = item.getVlUnitario()
                     .multiply(BigDecimal.valueOf(item.getQtd()));
 
+            // Calcula a comissão usando primeiro o percentual do produto.
             BigDecimal percentualComissao = produto.getPercentualComissao();
 
+            // Caso o produto não tenha comissão própria, usa a comissão da categoria.
             if (percentualComissao == null && produto.getCategoriaProduto() != null) {
                 percentualComissao = produto.getCategoriaProduto().getPercentualComissao();
             }
@@ -322,6 +393,7 @@ public class PedidoClienteController {
             }
         }
 
+        // Cria o lançamento de comissão para o promotor.
         Comissao comissao = new Comissao();
         comissao.setValor(valorTotalComissao);
         comissao.setData(LocalDate.now());
@@ -337,6 +409,7 @@ public class PedidoClienteController {
                 valorTotalComissao
         );
 
+        // Finaliza o pedido alterando seu status para PROCESSADO.
         pedido.setStatus("PROCESSADO");
 
         PedidoCliente pedidoProcessado = repository.save(pedido);
@@ -346,6 +419,12 @@ public class PedidoClienteController {
         return ResponseEntity.ok(montarPedidoModel(pedidoProcessado));
     }
 
+    /**
+     * Lista pedidos de cliente filtrados pelo status informado.
+     *
+     * Essa consulta facilita o acompanhamento dos pedidos em cada etapa
+     * do fluxo de venda.
+     */
     @GetMapping("/status/{status}")
     public List<PedidoCliente> listarPorStatus(@PathVariable String status) {
         return repository.findByStatus(status);

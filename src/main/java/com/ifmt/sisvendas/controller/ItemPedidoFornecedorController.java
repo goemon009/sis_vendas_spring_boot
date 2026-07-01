@@ -19,6 +19,12 @@ import com.ifmt.sisvendas.repository.ItemPedidoFornecedorRepository;
 import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
 
+/**
+ * Controller responsável pelos endpoints REST dos itens de pedido ao fornecedor.
+ *
+ * Os itens representam os produtos, quantidades e valores vinculados
+ * a um pedido.
+ */
 @RestController
 @RequestMapping("/itens-pedido-fornecedor")
 public class ItemPedidoFornecedorController {
@@ -36,11 +42,17 @@ public class ItemPedidoFornecedorController {
         this.produtoRepository = produtoRepository;
     }
 
+    /**
+     * Retorna todos os itens cadastrados.
+     */
     @GetMapping
     public List<ItemPedidoFornecedor> listar() {
         return repository.findAll();
     }
 
+    /**
+     * Cadastra um novo item vinculado ao respectivo documento.
+     */
     @PostMapping
     public ItemPedidoFornecedor cadastrar(@RequestBody ItemPedidoFornecedorDTO itemDTO) {
         PedidoFornecedor pedidoFornecedor =
@@ -59,11 +71,17 @@ public class ItemPedidoFornecedorController {
         return repository.save(item);
     }
 
+    /**
+     * Busca um item pelo seu identificador.
+     */
     @GetMapping("/{id}")
     public ItemPedidoFornecedor buscarPorId(@PathVariable Integer id) {
         return repository.findById(id).orElse(null);
     }
 
+    /**
+     * Atualiza os dados de um item existente.
+     */
     @PutMapping("/{id}")
     public ItemPedidoFornecedor atualizar(
             @PathVariable Integer id,
@@ -90,6 +108,9 @@ public class ItemPedidoFornecedorController {
         return repository.save(item);
     }
 
+    /**
+     * Remove um item pelo seu identificador.
+     */
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);

@@ -34,6 +34,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
+/**
+ * Controller responsável pelos endpoints REST de comissões.
+ *
+ * Permite cadastrar, consultar e acompanhar os lançamentos de comissão
+ * vinculados aos promotores de venda.
+ */
 @RestController
 @RequestMapping("/comissoes")
 @Tag(
@@ -59,6 +65,12 @@ public class ComissaoController {
         this.pedidoClienteRepository = pedidoClienteRepository;
     }
 
+    /**
+     * Lista comissões filtradas por status, promotor e intervalo de datas.
+     *
+     * Essa consulta permite acompanhar comissões lançadas ou quitadas
+     * em determinado período.
+     */
     @Operation(
             summary = "Listar comissões por status, promotor e período",
             description = """
@@ -157,6 +169,12 @@ public class ComissaoController {
         return repository.save(comissao);
     }
 
+    /**
+     * Quita uma comissão lançada.
+     *
+     * A operação altera o status da comissão de LANCADA para QUITADA,
+     * representando o pagamento ao promotor.
+     */
     @Operation(
             summary = "Quitar comissão",
             description = "Altera o status de uma comissão de LANCADA para QUITADA, representando o pagamento ao promotor de venda."

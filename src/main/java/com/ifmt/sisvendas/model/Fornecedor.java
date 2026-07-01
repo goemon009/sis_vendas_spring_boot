@@ -7,6 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um fornecedor.
+ *
+ * O fornecedor é utilizado nos processos de compra e reposição
+ * de produtos no estoque da empresa.
+ */
 @Entity
 @Table(name = "fornecedor")
 public class Fornecedor {

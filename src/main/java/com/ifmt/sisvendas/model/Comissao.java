@@ -12,6 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa uma comissão de venda.
+ *
+ * A comissão é gerada para um promotor quando um pedido de cliente
+ * é processado, iniciando com status LANCADA e podendo ser quitada depois.
+ */
 @Entity
 @Table(name = "comissao")
 public class Comissao {

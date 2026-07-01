@@ -21,6 +21,12 @@ import com.ifmt.sisvendas.repository.ProdutoRepository;
 
 import tools.jackson.databind.JsonNode;
 
+/**
+ * Controller responsável pelos endpoints REST de produtos.
+ *
+ * Permite manter o cadastro de produtos e executar consultas relacionadas
+ * à categoria e ao controle de estoque.
+ */
 @RestController
 @RequestMapping("/produtos")
 public class ProdutoController {
@@ -40,6 +46,12 @@ public class ProdutoController {
         return repository.findAll();
     }
 
+    /**
+     * Cadastra um novo produto a partir de um DTO.
+     *
+     * O DTO permite receber os dados do produto e os identificadores
+     * das entidades relacionadas, como a categoria.
+     */
     @PostMapping
     public ResponseEntity<?> cadastrar(@RequestBody ProdutoDTO produtoDTO) {
         CategoriaProduto categoria = buscarCategoria(produtoDTO);
@@ -60,6 +72,11 @@ public class ProdutoController {
         return repository.findById(id).orElse(null);
     }
 
+    /**
+     * Atualiza os dados de um produto existente.
+     *
+     * Caso o produto não seja encontrado, retorna uma resposta indicando erro.
+     */
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Integer id, @RequestBody ProdutoDTO produtoDTO) {
         Produto produto = repository.findById(id).orElse(null);
@@ -80,16 +97,29 @@ public class ProdutoController {
         return ResponseEntity.ok(repository.save(produto));
     }
 
+    /**
+     * Lista os produtos de uma categoria, ordenados pelo nome.
+     */
     @GetMapping("/categoria/{idCategoria}")
     public List<Produto> listarPorCategoriaOrdenadoPorNome(@PathVariable Integer idCategoria) {
         return repository.findByCategoriaProdutoIdCategoriaProdutoOrderByNomeAsc(idCategoria);
     }
 
+    /**
+     * Lista os produtos de uma categoria em ordem decrescente de estoque.
+     *
+     * Essa consulta ajuda a visualizar quais produtos possuem maior quantidade disponível.
+     */
     @GetMapping("/categoria/{idCategoria}/estoque-desc")
     public List<Produto> listarPorCategoriaOrdenadoPorEstoqueDesc(@PathVariable Integer idCategoria) {
         return repository.findByCategoriaProdutoIdCategoriaProdutoOrderByQtdEstoqueDesc(idCategoria);
     }
 
+    /**
+     * Lista os produtos cuja quantidade em estoque está abaixo do estoque mínimo.
+     *
+     * Essa consulta apoia o controle de reposição de produtos.
+     */
     @GetMapping("/estoque-baixo")
     public List<Produto> listarProdutosAbaixoEstoqueMinimo() {
         return repository.buscarProdutosAbaixoDoEstoqueMinimo();

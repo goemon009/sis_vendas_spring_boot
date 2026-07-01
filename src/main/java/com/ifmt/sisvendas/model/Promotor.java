@@ -9,6 +9,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um promotor de venda.
+ *
+ * O promotor é responsável por atender clientes e pode receber comissões
+ * pelas vendas vinculadas a eles.
+ */
 @Entity
 @Table(name = "promotor")
 public class Promotor {

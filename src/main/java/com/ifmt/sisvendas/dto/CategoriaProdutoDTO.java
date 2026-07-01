@@ -2,6 +2,12 @@ package com.ifmt.sisvendas.dto;
 
 import java.math.BigDecimal;
 
+/**
+ * DTO usado para receber dados de entrada da entidade CategoriaProduto.
+ *
+ * Essa classe simplifica o corpo das requisições e evita que o cliente
+ * da API precise enviar a entidade completa com todos os relacionamentos.
+ */
 public class CategoriaProdutoDTO {
 
     private String nome;

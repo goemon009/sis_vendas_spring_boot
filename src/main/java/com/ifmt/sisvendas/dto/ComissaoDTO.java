@@ -3,6 +3,12 @@ package com.ifmt.sisvendas.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * DTO usado para receber dados de entrada da entidade Comissao.
+ *
+ * Essa classe simplifica o corpo das requisições e evita que o cliente
+ * da API precise enviar a entidade completa com todos os relacionamentos.
+ */
 public class ComissaoDTO {
 
     private BigDecimal valor;

@@ -12,6 +12,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa uma conta a receber.
+ *
+ * É utilizada para registrar valores que a empresa deve receber
+ * em função de vendas realizadas a prazo.
+ */
 @Entity
 @Table(name = "contareceber")
 public class ContaReceber {

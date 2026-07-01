@@ -8,6 +8,12 @@ import com.ifmt.sisvendas.dto.CategoriaProdutoDTO;
 import com.ifmt.sisvendas.model.CategoriaProduto;
 import com.ifmt.sisvendas.repository.CategoriaProdutoRepository;
 
+/**
+ * Controller responsável pelos endpoints REST de categorias de produto.
+ *
+ * Permite cadastrar, consultar, atualizar e excluir categorias,
+ * além de listar categorias ordenadas pelo nome.
+ */
 @RestController
 @RequestMapping("/categorias")
 public class CategoriaProdutoController {
@@ -23,6 +29,11 @@ public class CategoriaProdutoController {
         return repository.findAll();
     }
 
+    /**
+     * Retorna as categorias de produto ordenadas alfabeticamente pelo nome.
+     *
+     * Essa consulta facilita a exibição organizada das categorias para o cliente da API.
+     */
     @GetMapping("/ordenadas")
     public List<CategoriaProduto> listarOrdenadasPorNome() {
         return repository.findAllByOrderByNomeAsc();

@@ -9,10 +9,22 @@ import org.springframework.data.repository.query.Param;
 
 import com.ifmt.sisvendas.model.Cliente;
 
+/**
+ * Repositório responsável pelas operações de persistência da entidade Cliente.
+ *
+ * Estende JpaRepository para herdar operações básicas de banco de dados,
+ * como salvar, buscar, listar e excluir registros.
+ */
 public interface ClienteRepository extends JpaRepository<Cliente, Integer> {
 
+    /**
+     * Busca um cliente pelo CNPJ.
+     */
     Cliente findByCnpj(String cnpj);
 
+    /**
+     * Busca clientes atendidos por um promotor, ordenados pelo valor total vendido no período.
+     */
     @Query("""
         SELECT c, SUM(p.vlTotal)
         FROM PedidoCliente p

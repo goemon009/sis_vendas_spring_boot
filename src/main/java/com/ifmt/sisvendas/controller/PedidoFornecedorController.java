@@ -20,6 +20,12 @@ import com.ifmt.sisvendas.repository.FornecedorRepository;
 import com.ifmt.sisvendas.repository.ItemPedidoFornecedorRepository;
 import com.ifmt.sisvendas.repository.PedidoFornecedorRepository;
 
+/**
+ * Controller responsável pelos endpoints REST de pedidos ao fornecedor.
+ *
+ * Permite registrar pedidos de compra usados para reposição
+ * de mercadorias no estoque.
+ */
 @RestController
 @RequestMapping("/pedidos-fornecedor")
 public class PedidoFornecedorController {
@@ -62,6 +68,12 @@ public class PedidoFornecedorController {
         return repository.findById(id).orElse(null);
     }
 
+    /**
+     * Retorna os dados gerais do pedido ao fornecedor junto com seus itens.
+     *
+     * Esse endpoint facilita a visualização completa de uma solicitação
+     * de compra feita a um fornecedor.
+     */
     @GetMapping("/{id}/detalhes")
     public Map<String, Object> buscarPedidoFornecedorComItens(@PathVariable Integer id) {
         PedidoFornecedor pedido = repository.findById(id).orElse(null);

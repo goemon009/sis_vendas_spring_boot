@@ -3,6 +3,12 @@ package com.ifmt.sisvendas.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
+/**
+ * Entidade que representa um item de entrada de mercadoria.
+ *
+ * Cada item indica o produto recebido e a quantidade que será adicionada
+ * ao estoque após o processamento da entrada.
+ */
 @Entity
 @Table(name = "itementradamercadoria")
 public class ItemEntradaMercadoria {
