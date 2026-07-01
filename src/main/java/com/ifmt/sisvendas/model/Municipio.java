@@ -9,6 +9,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um município.
+ *
+ * O município é usado para organizar a área de atuação dos promotores
+ * e a localização dos clientes.
+ */
 @Entity
 @Table(name = "municipio")
 public class Municipio {

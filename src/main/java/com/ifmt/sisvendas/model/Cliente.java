@@ -9,6 +9,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um cliente da empresa.
+ *
+ * O cliente corresponde a uma loja atendida por um promotor de venda
+ * e pode realizar pedidos de produtos.
+ */
 @Entity
 @Table(name = "cliente")
 public class Cliente {

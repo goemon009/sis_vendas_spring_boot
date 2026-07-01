@@ -25,6 +25,12 @@ import com.ifmt.sisvendas.repository.ClienteRepository;
 import com.ifmt.sisvendas.repository.MunicipioRepository;
 import com.ifmt.sisvendas.repository.PromotorRepository;
 
+/**
+ * Controller responsável pelos endpoints REST de clientes.
+ *
+ * Permite manter o cadastro de clientes, buscar cliente por CNPJ
+ * e consultar clientes vinculados a promotores de venda.
+ */
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
@@ -73,6 +79,12 @@ public class ClienteController {
         return clienteSalvo;
     }
 
+    /**
+     * Busca um cliente pelo identificador e retorna links HATEOAS relacionados.
+     *
+     * Os links permitem navegar para ações associadas ao cliente,
+     * como listagem geral, atualização e exclusão.
+     */
     @GetMapping("/{id}")
     public EntityModel<Cliente> buscarPorId(@PathVariable Integer id) {
         Cliente cliente = repository.findById(id).orElse(null);
@@ -92,6 +104,11 @@ public class ClienteController {
         );
     }
 
+    /**
+     * Busca um cliente pelo CNPJ.
+     *
+     * Essa consulta permite localizar uma loja cliente usando seu documento fiscal.
+     */
     @GetMapping("/cnpj/{cnpj}")
     public Cliente buscarPorCnpj(@PathVariable String cnpj) {
         Cliente cliente = repository.findByCnpj(cnpj);
@@ -105,6 +122,11 @@ public class ClienteController {
         return cliente;
     }
 
+    /**
+     * Lista clientes de um promotor ordenados pelo valor vendido em um período.
+     *
+     * Essa consulta apoia a análise de desempenho comercial dos promotores.
+     */
     @GetMapping("/promotor/{idPromotor}/valor-vendido")
     public List<Object[]> listarClientesPorValorVendido(
             @PathVariable Integer idPromotor,

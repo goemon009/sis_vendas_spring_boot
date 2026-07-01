@@ -12,6 +12,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um pagamento realizado por cliente.
+ *
+ * Registra informações de pagamento associadas aos pedidos de venda.
+ */
 @Entity
 @Table(name = "pagamentocliente")
 public class PagamentoCliente {

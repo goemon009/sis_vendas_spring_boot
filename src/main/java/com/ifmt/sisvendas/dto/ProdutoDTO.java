@@ -4,6 +4,12 @@ import java.math.BigDecimal;
 
 import tools.jackson.databind.JsonNode;
 
+/**
+ * DTO usado para receber dados de entrada da entidade Produto.
+ *
+ * Essa classe simplifica o corpo das requisições e evita que o cliente
+ * da API precise enviar a entidade completa com todos os relacionamentos.
+ */
 public class ProdutoDTO {
 
     private String nome;

@@ -11,6 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa um produto comercializado pela empresa.
+ *
+ * Armazena dados de cadastro, valores comerciais, controle de estoque,
+ * promoção e percentual de comissão.
+ */
 @Entity
 @Table(name = "produto")
 public class Produto {

@@ -3,6 +3,11 @@ package com.ifmt.sisvendas.controller;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,9 +26,30 @@ import com.ifmt.sisvendas.repository.ComissaoRepository;
 import com.ifmt.sisvendas.repository.PedidoClienteRepository;
 import com.ifmt.sisvendas.repository.PromotorRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
+/**
+ * Controller responsável pelos endpoints REST de comissões.
+ *
+ * Permite cadastrar, consultar e acompanhar os lançamentos de comissão
+ * vinculados aos promotores de venda.
+ */
 @RestController
 @RequestMapping("/comissoes")
+@Tag(
+        name = "Comissões",
+        description = "Endpoints para cadastro, consulta e quitação de comissões dos promotores."
+)
 public class ComissaoController {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(ComissaoController.class);
 
     private final ComissaoRepository repository;
     private final PromotorRepository promotorRepository;
@@ -39,12 +65,35 @@ public class ComissaoController {
         this.pedidoClienteRepository = pedidoClienteRepository;
     }
 
+    /**
+     * Lista comissões filtradas por status, promotor e intervalo de datas.
+     *
+     * Essa consulta permite acompanhar comissões lançadas ou quitadas
+     * em determinado período.
+     */
+    @Operation(
+            summary = "Listar comissões por status, promotor e período",
+            description = """
+                    Retorna os lançamentos de comissão filtrados por status,
+                    promotor de venda e intervalo de data.
+                    Status previstos: LANCADA e QUITADA.
+                    """
+    )
+    @ApiResponse(responseCode = "200", description = "Comissões retornadas com sucesso")
     @GetMapping("/status/{status}/promotor/{idPromotor}")
     public List<Comissao> listarPorStatusPromotorEPeriodo(
             @PathVariable String status,
             @PathVariable Integer idPromotor,
-            @RequestParam LocalDate dataInicio,
-            @RequestParam LocalDate dataFim) {
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+
+        logger.info(
+                "Consultando comissões. Status: {}, promotor: {}, período: {} até {}",
+                status,
+                idPromotor,
+                dataInicio,
+                dataFim
+        );
 
         return repository.findByStatusAndPromotorIdPromotorAndDataBetween(
                 status,
@@ -120,9 +169,67 @@ public class ComissaoController {
         return repository.save(comissao);
     }
 
+    /**
+     * Quita uma comissão lançada.
+     *
+     * A operação altera o status da comissão de LANCADA para QUITADA,
+     * representando o pagamento ao promotor.
+     */
+    @Operation(
+            summary = "Quitar comissão",
+            description = "Altera o status de uma comissão de LANCADA para QUITADA, representando o pagamento ao promotor de venda."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Comissão quitada com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Comissão não está em situação válida para quitação"),
+            @ApiResponse(responseCode = "404", description = "Comissão não encontrada")
+    })
+    @PutMapping("/{id}/quitar")
+    public ResponseEntity<EntityModel<Comissao>> quitar(@PathVariable Integer id) {
+        logger.info("Iniciando quitação da comissão. ID: {}", id);
+
+        Comissao comissao = repository.findById(id).orElse(null);
+
+        if (comissao == null) {
+            logger.warn("Comissão não encontrada para quitação. ID: {}", id);
+            return ResponseEntity.notFound().build();
+        }
+
+        if (!"LANCADA".equals(comissao.getStatus())) {
+            logger.warn(
+                    "Comissão {} não pode ser quitada. Status atual: {}",
+                    id,
+                    comissao.getStatus()
+            );
+
+            return ResponseEntity.badRequest().body(montarComissaoModel(comissao));
+        }
+
+        comissao.setStatus("QUITADA");
+
+        Comissao comissaoQuitada = repository.save(comissao);
+
+        logger.info("Comissão quitada com sucesso. ID: {}", id);
+
+        return ResponseEntity.ok(montarComissaoModel(comissaoQuitada));
+    }
+
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
+    }
+
+    private EntityModel<Comissao> montarComissaoModel(Comissao comissao) {
+        return EntityModel.of(
+                comissao,
+                linkTo(methodOn(ComissaoController.class)
+                        .buscarPorId(comissao.getIdComissao()))
+                        .withSelfRel(),
+
+                linkTo(methodOn(ComissaoController.class)
+                        .listar())
+                        .withRel("listar-comissoes")
+        );
     }
 
     private void aplicarDadosDTO(

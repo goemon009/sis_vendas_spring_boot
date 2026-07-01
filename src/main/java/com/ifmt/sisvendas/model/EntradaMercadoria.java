@@ -11,6 +11,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa uma entrada de mercadoria.
+ *
+ * A entrada registra o recebimento de produtos comprados de fornecedores
+ * e passa por etapas como digitação, conferência e processamento.
+ */
 @Entity
 @Table(name = "entradamercadoria")
 public class EntradaMercadoria {

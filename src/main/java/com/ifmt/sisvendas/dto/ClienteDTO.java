@@ -1,5 +1,11 @@
 package com.ifmt.sisvendas.dto;
 
+/**
+ * DTO usado para receber dados de entrada da entidade Cliente.
+ *
+ * Essa classe simplifica o corpo das requisições e evita que o cliente
+ * da API precise enviar a entidade completa com todos os relacionamentos.
+ */
 public class ClienteDTO {
 
     private String razaoSocial;

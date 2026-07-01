@@ -5,6 +5,12 @@ import java.time.LocalDate;
 
 import jakarta.persistence.*;
 
+/**
+ * Entidade que representa um pedido realizado por um cliente.
+ *
+ * O pedido possui informações gerais da venda, cliente, promotor,
+ * valor total, datas e status do processo de atendimento.
+ */
 @Entity
 @Table(name = "pedidocliente")
 public class PedidoCliente {

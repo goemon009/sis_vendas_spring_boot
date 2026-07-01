@@ -7,6 +7,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+/**
+ * Entidade que representa uma região de atuação.
+ *
+ * A região agrupa municípios e ajuda a organizar a cobertura
+ * comercial dos promotores de venda.
+ */
 @Entity 
 @Table(name = "regiao")
 public class Regiao {

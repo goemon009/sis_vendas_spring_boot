@@ -21,6 +21,12 @@ import com.ifmt.sisvendas.repository.FornecedorRepository;
 import com.ifmt.sisvendas.repository.ItemEntradaMercadoriaRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
 
+/**
+ * Controller responsável pelos endpoints REST de entrada de mercadoria.
+ *
+ * Controla o recebimento de produtos comprados de fornecedores,
+ * incluindo cadastro, conferência e processamento da entrada.
+ */
 @RestController
 @RequestMapping("/entradas-mercadoria")
 public class EntradaMercadoriaController {
@@ -94,6 +100,12 @@ public class EntradaMercadoriaController {
         repository.deleteById(id);
     }
 
+    /**
+     * Altera o status da entrada de mercadoria para CONFERIDA.
+     *
+     * Essa etapa representa a verificação dos produtos recebidos
+     * em relação ao que foi digitado no sistema.
+     */
     @PutMapping("/{id}/conferir")
     public EntradaMercadoria conferir(@PathVariable Integer id) {
         EntradaMercadoria entrada = repository.findById(id).orElse(null);
@@ -107,8 +119,15 @@ public class EntradaMercadoriaController {
         return repository.save(entrada);
     }
 
+    /**
+     * Processa uma entrada de mercadoria conferida.
+     *
+     * A operação adiciona as quantidades recebidas ao estoque dos produtos
+     * e altera o status da entrada para PROCESSADA.
+     */
     @PutMapping("/{id}/processar")
     public EntradaMercadoria processar(@PathVariable Integer id) {
+        // Busca a entrada de mercadoria que será processada.
         EntradaMercadoria entrada = repository.findById(id).orElse(null);
 
         if (entrada == null) {
@@ -119,6 +138,7 @@ public class EntradaMercadoriaController {
             return entrada;
         }
 
+        // Busca os itens vinculados à entrada.
         List<ItemEntradaMercadoria> itens =
                 itemRepository.findByEntradaMercadoriaIdEntradaMercadoria(id);
 
@@ -128,11 +148,13 @@ public class EntradaMercadoriaController {
             Integer estoqueAtual = produto.getQtdEstoque();
             Integer quantidadeEntrada = item.getQtd();
 
+            // Soma a quantidade recebida ao estoque atual de cada produto.
             produto.setQtdEstoque(estoqueAtual + quantidadeEntrada);
 
             produtoRepository.save(produto);
         }
 
+        // Finaliza a entrada alterando seu status para PROCESSADA.
         entrada.setStatus("PROCESSADA");
 
         return repository.save(entrada);

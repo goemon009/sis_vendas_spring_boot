@@ -17,6 +17,11 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 
+/**
+ * Classe de configuração auxiliar da aplicação.
+ *
+ * Centraliza configurações usadas pelo Spring durante a execução da API.
+ */
 @RestControllerAdvice
 public class GeneratedIdRequestBodyAdvice extends RequestBodyAdviceAdapter {
 
