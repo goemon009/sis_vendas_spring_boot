@@ -5,6 +5,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.ifmt.sisvendas.dto.PedidoClienteDTO;
@@ -21,9 +26,24 @@ import com.ifmt.sisvendas.repository.PedidoClienteRepository;
 import com.ifmt.sisvendas.repository.ProdutoRepository;
 import com.ifmt.sisvendas.repository.PromotorRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 @RestController
 @RequestMapping("/pedidos-cliente")
+@Tag(
+        name = "Pedidos de Cliente",
+        description = "Endpoints para cadastro, consulta e processamento de pedidos de cliente."
+)
 public class PedidoClienteController {
+
+    private static final Logger logger =
+            LoggerFactory.getLogger(PedidoClienteController.class);
 
     private final PedidoClienteRepository repository;
     private final ItemPedidoClienteRepository itemRepository;
@@ -193,20 +213,78 @@ public class PedidoClienteController {
         return repository.save(pedido);
     }
 
+    @Transactional
+    @Operation(
+            summary = "Processar pedido de cliente",
+            description = """
+                    Processa um pedido de cliente com status PEDIDO_PROGRAMADO.
+                    A operacao baixa o estoque dos produtos, calcula a comissao do promotor,
+                    gera um lancamento de comissao com status LANCADA e altera o pedido para PROCESSADO.
+                    """
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Pedido processado com sucesso"),
+            @ApiResponse(responseCode = "400", description = "Pedido sem condicao valida para processamento"),
+            @ApiResponse(responseCode = "404", description = "Pedido nao encontrado")
+    })
     @PutMapping("/{id}/processar")
-    public PedidoCliente processar(@PathVariable Integer id) {
+    public ResponseEntity<EntityModel<PedidoCliente>> processar(@PathVariable Integer id) {
+        logger.info("Iniciando processamento do pedido de cliente. ID: {}", id);
+
         PedidoCliente pedido = repository.findById(id).orElse(null);
 
         if (pedido == null) {
-            return null;
+            logger.warn("Pedido de cliente nao encontrado para processamento. ID: {}", id);
+            return ResponseEntity.notFound().build();
         }
 
         if (!"PEDIDO_PROGRAMADO".equals(pedido.getStatus())) {
-            return pedido;
+            logger.warn(
+                    "Pedido {} nao pode ser processado. Status atual: {}",
+                    id,
+                    pedido.getStatus()
+            );
+
+            return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
+        }
+
+        if (pedido.getPromotor() == null) {
+            logger.warn("Pedido {} nao possui promotor vinculado.", id);
+            return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
         }
 
         List<ItemPedidoCliente> itens =
                 itemRepository.findByPedidoClienteIdPedidoCliente(id);
+
+        if (itens.isEmpty()) {
+            logger.warn("Pedido {} nao possui itens para processamento.", id);
+            return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
+        }
+
+        for (ItemPedidoCliente item : itens) {
+            Produto produto = item.getProduto();
+
+            if (produto == null || item.getQtd() == null || item.getVlUnitario() == null) {
+                logger.warn("Pedido {} possui item invalido para processamento.", id);
+                return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
+            }
+
+            if (produto.getQtdEstoque() == null) {
+                logger.warn("Produto {} nao possui estoque informado.", produto.getIdProduto());
+                return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
+            }
+
+            if (produto.getQtdEstoque() < item.getQtd()) {
+                logger.warn(
+                        "Estoque insuficiente para o produto {}. Estoque atual: {}, quantidade solicitada: {}",
+                        produto.getIdProduto(),
+                        produto.getQtdEstoque(),
+                        item.getQtd()
+                );
+
+                return ResponseEntity.badRequest().body(montarPedidoModel(pedido));
+            }
+        }
 
         BigDecimal valorTotalComissao = BigDecimal.ZERO;
 
@@ -219,12 +297,19 @@ public class PedidoClienteController {
             produto.setQtdEstoque(estoqueAtual - quantidadeVendida);
             produtoRepository.save(produto);
 
+            logger.info(
+                    "Estoque atualizado. Produto: {}, quantidade vendida: {}, novo estoque: {}",
+                    produto.getIdProduto(),
+                    quantidadeVendida,
+                    produto.getQtdEstoque()
+            );
+
             BigDecimal subtotal = item.getVlUnitario()
                     .multiply(BigDecimal.valueOf(item.getQtd()));
 
             BigDecimal percentualComissao = produto.getPercentualComissao();
 
-            if (percentualComissao == null) {
+            if (percentualComissao == null && produto.getCategoriaProduto() != null) {
                 percentualComissao = produto.getCategoriaProduto().getPercentualComissao();
             }
 
@@ -246,9 +331,19 @@ public class PedidoClienteController {
 
         comissaoRepository.save(comissao);
 
+        logger.info(
+                "Comissao lancada para o promotor {} no valor de {}",
+                pedido.getPromotor().getIdPromotor(),
+                valorTotalComissao
+        );
+
         pedido.setStatus("PROCESSADO");
 
-        return repository.save(pedido);
+        PedidoCliente pedidoProcessado = repository.save(pedido);
+
+        logger.info("Pedido de cliente processado com sucesso. ID: {}", id);
+
+        return ResponseEntity.ok(montarPedidoModel(pedidoProcessado));
     }
 
     @GetMapping("/status/{status}")
@@ -259,6 +354,27 @@ public class PedidoClienteController {
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable Integer id) {
         repository.deleteById(id);
+    }
+
+    private EntityModel<PedidoCliente> montarPedidoModel(PedidoCliente pedido) {
+        return EntityModel.of(
+                pedido,
+                linkTo(methodOn(PedidoClienteController.class)
+                        .buscarPorId(pedido.getIdPedidoCliente()))
+                        .withSelfRel(),
+
+                linkTo(methodOn(PedidoClienteController.class)
+                        .buscarPedidoComItens(pedido.getIdPedidoCliente()))
+                        .withRel("detalhes-do-pedido"),
+
+                linkTo(methodOn(PedidoClienteController.class)
+                        .listar())
+                        .withRel("listar-pedidos"),
+
+                linkTo(methodOn(PedidoClienteController.class)
+                        .listarPorStatus(pedido.getStatus()))
+                        .withRel("pedidos-por-status")
+        );
     }
 
     private void aplicarDadosDTO(
