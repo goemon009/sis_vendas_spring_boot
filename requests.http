@@ -1,0 +1,157 @@
+@baseUrl = http://localhost:8080
+
+@categoriaId = 1
+@produtoId = 1
+@regiaoId = 1
+@municipioId = 1
+@promotorId = 1
+@clienteId = 1
+@pedidoId = 1
+@itemPedidoId = 1
+@comissaoId = 1
+
+### Verificar se a API está viva
+GET {{baseUrl}}/v3/api-docs
+
+### 1) Cadastrar categoria de produto
+POST {{baseUrl}}/categorias
+Content-Type: application/json
+
+{
+  "nome": "Bebidas",
+  "percentualComissao": 5.0,
+  "percentualDesconto": 2.0
+}
+
+### Listar categoria cadastrada
+GET {{baseUrl}}/categorias/{{categoriaId}}
+
+### 2) Cadastrar produto com estoque suficiente
+POST {{baseUrl}}/produtos
+Content-Type: application/json
+
+{
+  "nome": "Refrigerante Cola 2L",
+  "vlCusto": 4.50,
+  "qtdEstoque": 20,
+  "qtdReservadaProduto": 0,
+  "qtdMinEstoque": 5,
+  "qtdMaxEstoque": 100,
+  "percentualComissao": 5.0,
+  "percentualPromocao": 0.0,
+  "margemLucro": 20.0,
+  "idCategoriaProduto": 1
+}
+
+### Listar produto cadastrado
+GET {{baseUrl}}/produtos/{{produtoId}}
+
+### 3) Cadastrar região
+POST {{baseUrl}}/regioes
+Content-Type: application/json
+
+{
+  "nome": "Centro-Oeste"
+}
+
+### Listar região cadastrada
+GET {{baseUrl}}/regioes/{{regiaoId}}
+
+### 4) Cadastrar município
+POST {{baseUrl}}/municipios
+Content-Type: application/json
+
+{
+  "nome": "Cuiabá",
+  "uf": "MT",
+  "idRegiao": 1
+}
+
+### Listar município cadastrado
+GET {{baseUrl}}/municipios/{{municipioId}}
+
+### 5) Cadastrar promotor de venda
+POST {{baseUrl}}/promotores
+Content-Type: application/json
+
+{
+  "nome": "Ana Promotora",
+  "cpf": "12345678900",
+  "idRegiao": 1
+}
+
+### Listar promotor cadastrado
+GET {{baseUrl}}/promotores/{{promotorId}}
+
+### 6) Cadastrar cliente vinculado ao promotor e município
+POST {{baseUrl}}/clientes
+Content-Type: application/json
+
+{
+  "razaoSocial": "Mercado Bom Preço",
+  "nomeFantasia": "Mercado Bom Preço",
+  "cnpj": "12345678000199",
+  "inscricaoEstadual": "123456789",
+  "endereco": "Rua das Flores, 100",
+  "idPromotor": 1,
+  "idMunicipio": 1
+}
+
+### Listar cliente cadastrado
+GET {{baseUrl}}/clientes/{{clienteId}}
+
+### 7) Cadastrar pedido de cliente
+POST {{baseUrl}}/pedidos-cliente
+Content-Type: application/json
+
+{
+  "vlTotal": 17.00,
+  "dtSolicitacao": "2026-07-01",
+  "dtProgramacaoEntrega": null,
+  "status": "PENDENTE_ESTOQUE",
+  "idCliente": 1,
+  "idPromotor": 1
+}
+
+### Listar pedido cadastrado
+GET {{baseUrl}}/pedidos-cliente/{{pedidoId}}
+
+### 8) Cadastrar item de pedido de cliente
+POST {{baseUrl}}/itens-pedido-cliente
+Content-Type: application/json
+
+{
+  "qtd": 2,
+  "vlUnitario": 8.50,
+  "idPedidoCliente": 1,
+  "idProduto": 1
+}
+
+### Listar item de pedido cadastrado
+GET {{baseUrl}}/itens-pedido-cliente/{{itemPedidoId}}
+
+### 9) Programar o pedido antes de processar
+PUT {{baseUrl}}/pedidos-cliente/{{pedidoId}}/programar
+Content-Type: application/json
+
+{
+  "dtProgramacaoEntrega": "2026-07-15"
+}
+
+### 10) Processar o pedido de cliente
+PUT {{baseUrl}}/pedidos-cliente/{{pedidoId}}/processar
+
+### 11) Listar comissões
+GET {{baseUrl}}/comissoes
+
+### 12) Quitar a comissão, se existir
+PUT {{baseUrl}}/comissoes/{{comissaoId}}/quitar
+
+### 13) Listar comissões novamente
+GET {{baseUrl}}/comissoes
+
+### Sequência recomendada
+# 1. Execute as requisições de 1 a 8 na ordem.
+# 2. Depois execute a requisição 9 (programar).
+# 3. Em seguida execute a requisição 10 (processar).
+# 4. Por fim execute 11, 12 e 13 para validar comissão e quitação.
